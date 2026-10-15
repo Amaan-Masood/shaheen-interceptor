@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+:root {
+  --bg-obsidian: #05070B;
+  --panel-bg: #090D14;
+  --border-tactical: #1E293B;
+  --accent-crimson: #EF4444;
+  --accent-amber: #F59E0B;
+  --accent-emerald: #10B981;
+  --accent-cyan: #38BDF8;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #05070B;
+  color: #E2E8F0;
+  font-family: 'JetBrains Mono', monospace, ui-monospace;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #05070B;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Tactical Corner Crosshairs (+) on containers */
+.tactical-box {
+  position: relative;
+}
+.tactical-box::before,
+.tactical-box::after {
+  content: "+";
+  position: absolute;
+  font-family: monospace;
+  font-size: 11px;
+  color: rgba(239, 68, 68, 0.4);
+  line-height: 1;
+  pointer-events: none;
+}
+.tactical-box::before {
+  top: 2px;
+  left: 3px;
+}
+.tactical-box::after {
+  bottom: 2px;
+  right: 3px;
+}
+
+/* Subtle CRT Scanline overlay */
+.crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.02),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.02)
+  );
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Diagonal Hazard Stripes for Critical Warnings */
+.hazard-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(239, 68, 68, 0.15),
+    rgba(239, 68, 68, 0.15) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+/* Threat Pulses */
+@keyframes pulseCrimsonGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25), inset 0 0 10px rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.7), inset 0 0 20px rgba(239, 68, 68, 0.4);
+    border-color: rgba(239, 68, 68, 1);
+  }
+}
+.pulse-crimson {
+  animation: pulseCrimsonGlow 2s infinite ease-in-out;
+}
+
+/* Flow Dash Animation for SVG Links */
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.flow-animated {
+  stroke-dasharray: 6 3;
+  animation: flowDash 0.8s linear infinite;
+}
+
+/* Radar Sweep Ring */
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.radar-sweep {
+  transform-origin: center;
+  animation: radarSweep 8s linear infinite;
+}
+
+/* Text glow */
+.text-glow-red {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+.text-glow-cyan {
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+}
+.text-glow-green {
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+}

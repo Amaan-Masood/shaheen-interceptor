@@ -1,0 +1,38 @@
+@SHAHEEN_INTERCEPTOR_SPEC.md 
+Active Skills: /ai-agent-architecture /tech-stack-orchestrator /frontend-ui-upgrade /ai-software-factory-complete-sdlc-framework
+
+Upar di gayi specification file aur active skills ko follow karte hue "Shaheen Interceptor" (BFSI Fraud, Vishing & Money Mule Defense Platform) ka complete, working full-stack monorepo build karo jo Google Cloud Run aur Firebase Hosting par deploy hone ke liye 100% ready ho.
+
+Project ko 2 main folders mein divide karo: `/backend` aur `/frontend`.
+
+### PHASE 1: BACKEND (`/backend` - Python FastAPI + Gemini + Firestore)
+1. Files banao: `main.py`, `agents.py`, `seed_data.py`, `requirements.txt`, `Dockerfile`, aur `.env.example`.
+2. `google-genai` SDK (`gemini-2.5-flash`) use karke 3 agents implement karo:
+   - Agent 1 (Vishing & Coercion Detector): Call transcript aur payment context analyze karke `coercion_score` (0-100), `detected_tactics[]`, aur `highlighted_quotes[]` structured JSON mein return kare.
+   - Agent 2 (Mule Graph Hunter): Receiver account ka 3-hop network aur velocity check kare (Firestore ya in-memory fallback se) aur `mule_risk_score` (0-100) + `graph_nodes` aur `graph_edges` return kare.
+   - Agent 3 (Active Decoy & SAR Generator): 
+     a) `/api/decoy/chat` endpoint par scammer ke sath confused bank customer ban kar baat kare aur scammer se uska backup IBAN/Raast account nikalwaye (regex + LLM se IOCs extract kare).
+     b) `/api/generate-sar` endpoint par complete audit-ready Suspicious Activity Report (Markdown format) generate kare.
+3. `/api/run-benchmark` endpoint banao jo 20 synthetic scenarios (15 scam cases + 5 clean baseline urgent cases jaise hospital payment) test kare aur real-time `avg_latency_ms`, `detection_recall_percent`, aur `false_positive_rate_percent` return kare.
+4. Smart Fallback Rule: Agar Firestore credentials (`serviceAccountKey.json`) local testing mein na milein, toh backend crash hone ke bajaye automatically local in-memory state + Firestore dual-sync mode mein kaam kare taake demo kabhi fail na ho.
+
+### PHASE 2: FRONTEND (`/frontend` - React + Vite + Tailwind CSS + Lucide Icons)
+`/frontend-ui-upgrade` skill use karke ek high-contrast Dark-Mode Cyber Command Center UI banao jisme 3 panels hon:
+1. Top Navbar: Shaheen Falcon branding, Live Service Status pills (`Cloud Run: Active`, `Firestore: Real-time`, `Gemini 2.5 Flash: Connected`), aur ek `[Run Benchmark Suite]` button (jo modal khol kar Slide 12 ke liye latency, recall, aur false-positive metrics dikhaye).
+2. Left Panel (Live Threat & Call Simulator):
+   - 3 Pre-loaded Scenarios ke buttons:
+     a) Scenario 1: FIA/Bank Impersonation Vishing Scam (Critical Risk)
+     b) Scenario 2: Distributed Money Mule Smurfing Ring (High Risk)
+     c) Scenario 3: Legitimate Hospital Emergency Transfer (Clean Baseline Test - 0% False Positive dikhane ke liye)
+   - Live scrolling call transcript jahan dangerous phrases red color mein highlight hon, aur neeche `[Simulate Live Transfer & Intercept]` button ho.
+3. Center Panel (Visual Intelligence Arena - 2 Tabs):
+   - Tab 1 (Mule Network Graph): Custom SVG/Canvas interactive node-link graph jo Victim -> Primary Receiver -> Connected Mule Accounts ko red pulsing nodes aur arrows ke sath dikhaye.
+   - Tab 2 (Active AI Decoy Honeypot): Interactive live chat box jahan Shaheen Decoy Agent scammer ko baaton mein uljha kar uska doosra bank account (IBAN) extract karta hua nazar aaye, aur extract hote hi "NEW MULE IOC CAPTURED" ka red badge chamke.
+4. Right Panel (Gemini Forensic Dossier & Action Center):
+   - Animated Risk Gauge (0-100%), Processing Latency badge (`e.g., 780 ms`), aur Evidence Chain cards.
+   - 2 Action Buttons: `[Quarantine & Deploy Decoy]` aur `[Freeze Accounts & Generate SAR]` (jo modal mein poori Regulatory SAR report dikhaye aur PDF/Print ka option de).
+
+### PHASE 3: DEPLOYMENT SCRIPTS
+Root folder mein `deploy.sh` aur `README.md` banao jisme Cloud Run aur Firebase Hosting par deploy karne ki exact commands likhi hon.
+
+Pehle `/backend` ki tamam files generate karo, phir `/frontend` ki tamam files generate karo. Koi bhi placeholder ya `TODO` mat chhorna—pura working code likho.
