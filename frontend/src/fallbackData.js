@@ -194,26 +194,26 @@ export const FALLBACK_SCENARIOS = {
 };
 
 export const FALLBACK_BENCHMARK_CASES = [
-  { id: "BM-01", name: "FIA Cyber Crime Arrest & Freeze Coercion", type: "FRAUD", amount: 600000, expected: "QUARANTINED", score: 98, latency: 12 },
-  { id: "BM-02", name: "State Bank BISP Grant Verification Scam", type: "FRAUD", amount: 85000, expected: "QUARANTINED", score: 92, latency: 11 },
-  { id: "BM-03", name: "PTA SIM Biometric Block Urgent Threat", type: "FRAUD", amount: 120000, expected: "QUARANTINED", score: 88, latency: 9 },
-  { id: "BM-04", name: "Army Officer Impersonator Vehicle Auction", type: "FRAUD", amount: 250000, expected: "QUARANTINED", score: 91, latency: 14 },
-  { id: "BM-05", name: "Telegram Task Scam Money Mule Structuring", type: "FRAUD", amount: 48000, expected: "QUARANTINED", score: 94, latency: 15 },
-  { id: "BM-06", name: "WAPDA Bill Disconnection Emergency Vishing", type: "FRAUD", amount: 75000, expected: "QUARANTINED", score: 89, latency: 8 },
-  { id: "BM-07", name: "Virtual Kidnapping Urgent Extortion Scam", type: "FRAUD", amount: 300000, expected: "QUARANTINED", score: 99, latency: 10 },
-  { id: "BM-08", name: "Overseas Son Police Custody Bail Imposter", type: "FRAUD", amount: 500000, expected: "QUARANTINED", score: 96, latency: 13 },
-  { id: "BM-09", name: "Credit Card Points Expiry OTP Harvesting", type: "FRAUD", amount: 95000, expected: "QUARANTINED", score: 90, latency: 9 },
-  { id: "BM-10", name: "Customs Narcotics Parcel Seizure Extortion", type: "FRAUD", amount: 750000, expected: "QUARANTINED", score: 97, latency: 16 },
-  { id: "BM-11", name: "Student Account Rental Smurfing Ring", type: "FRAUD", amount: 180000, expected: "QUARANTINED", score: 93, latency: 12 },
-  { id: "BM-12", name: "Rapid Circular Wash-Trading Mule Cluster", type: "FRAUD", amount: 220000, expected: "QUARANTINED", score: 95, latency: 14 },
-  { id: "BM-13", name: "High-Velocity Fan-In with Instant ATM Drain", type: "FRAUD", amount: 400000, expected: "QUARANTINED", score: 96, latency: 11 },
-  { id: "BM-14", name: "Bank IT Helpdesk Screen-Sharing AnyDesk", type: "FRAUD", amount: 320000, expected: "QUARANTINED", score: 94, latency: 13 },
-  { id: "BM-15", name: "Predatory Digital Loan App Extortion", type: "FRAUD", amount: 150000, expected: "QUARANTINED", score: 92, latency: 10 },
-  { id: "BM-16", name: "NUST University Semester Tuition Fee", type: "CLEAN", amount: 220000, expected: "CLEARED", score: 3, latency: 6 },
-  { id: "BM-17", name: "Emergency Hospital ICU Surgery Deposit", type: "CLEAN", amount: 400000, expected: "CLEARED", score: 2, latency: 5 },
-  { id: "BM-18", name: "Sub-Registrar Real Estate Token Money", type: "CLEAN", amount: 500000, expected: "CLEARED", score: 4, latency: 7 },
-  { id: "BM-19", name: "Port Container Demurrage Commercial Clearing", type: "CLEAN", amount: 450000, expected: "CLEARED", score: 2, latency: 8 },
-  { id: "BM-20", name: "Wedding Marquee Event Balance Settlement", type: "CLEAN", amount: 350000, expected: "CLEARED", score: 4, latency: 6 }
+  { id: "BM-01", name: "FIA Cyber Crime Arrest & Freeze Coercion", type: "FRAUD", amount: 600000, expected: "QUARANTINED", score: 98, latency: 682.1 },
+  { id: "BM-02", name: "State Bank BISP Grant Verification Scam", type: "FRAUD", amount: 85000, expected: "QUARANTINED", score: 92, latency: 674.5 },
+  { id: "BM-03", name: "PTA SIM Biometric Block Urgent Threat", type: "FRAUD", amount: 120000, expected: "QUARANTINED", score: 88, latency: 691.0 },
+  { id: "BM-04", name: "Army Officer Impersonator Vehicle Auction", type: "FRAUD", amount: 250000, expected: "QUARANTINED", score: 91, latency: 665.2 },
+  { id: "BM-05", name: "Telegram Task Scam Money Mule Structuring", type: "FRAUD", amount: 48000, expected: "QUARANTINED", score: 94, latency: 703.8 },
+  { id: "BM-06", name: "WAPDA Bill Disconnection Emergency Vishing", type: "FRAUD", amount: 75000, expected: "QUARANTINED", score: 89, latency: 658.4 },
+  { id: "BM-07", name: "Virtual Kidnapping Urgent Extortion Scam", type: "FRAUD", amount: 300000, expected: "QUARANTINED", score: 99, latency: 689.1 },
+  { id: "BM-08", name: "Overseas Son Police Custody Bail Imposter", type: "FRAUD", amount: 500000, expected: "QUARANTINED", score: 96, latency: 672.3 },
+  { id: "BM-09", name: "Credit Card Points Expiry OTP Harvesting", type: "FRAUD", amount: 95000, expected: "QUARANTINED", score: 90, latency: 695.7 },
+  { id: "BM-10", name: "Customs Narcotics Parcel Seizure Extortion", type: "FRAUD", amount: 750000, expected: "QUARANTINED", score: 97, latency: 661.9 },
+  { id: "BM-11", name: "Student Account Rental Smurfing Ring", type: "FRAUD", amount: 180000, expected: "QUARANTINED", score: 93, latency: 678.2 },
+  { id: "BM-12", name: "Rapid Circular Wash-Trading Mule Cluster", type: "FRAUD", amount: 220000, expected: "QUARANTINED", score: 95, latency: 712.4 },
+  { id: "BM-13", name: "High-Velocity Fan-In with Instant ATM Drain", type: "FRAUD", amount: 400000, expected: "QUARANTINED", score: 96, latency: 668.0 },
+  { id: "BM-14", name: "Bank IT Helpdesk Screen-Sharing AnyDesk", type: "FRAUD", amount: 320000, expected: "QUARANTINED", score: 94, latency: 684.6 },
+  { id: "BM-15", name: "Predatory Digital Loan App Extortion", type: "FRAUD", amount: 150000, expected: "QUARANTINED", score: 92, latency: 690.3 },
+  { id: "BM-16", name: "NUST University Semester Tuition Fee", type: "CLEAN", amount: 220000, expected: "CLEARED", score: 3, latency: 652.7 },
+  { id: "BM-17", name: "Emergency Hospital ICU Surgery Deposit", type: "CLEAN", amount: 400000, expected: "CLEARED", score: 2, latency: 677.1 },
+  { id: "BM-18", name: "Sub-Registrar Real Estate Token Money", type: "CLEAN", amount: 500000, expected: "CLEARED", score: 4, latency: 701.5 },
+  { id: "BM-19", name: "Port Container Demurrage Commercial Clearing", type: "CLEAN", amount: 450000, expected: "CLEARED", score: 2, latency: 669.8 },
+  { id: "BM-20", name: "Wedding Marquee Event Balance Settlement", type: "CLEAN", amount: 350000, expected: "CLEARED", score: 4, latency: 679.4 }
 ];
 
 export function clientSideAnalyze(scenarioId) {

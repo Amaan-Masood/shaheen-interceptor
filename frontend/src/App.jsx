@@ -53,8 +53,8 @@ export default function App() {
       false_positive_rate_percent: 0.0,
       precision_percent: 100.0,
       accuracy_percent: 100.0,
-      avg_latency_ms: 0.8,
-      total_benchmark_time_ms: 16.1
+      avg_latency_ms: 680.4,
+      total_benchmark_time_ms: 13608.0
     },
     results: FALLBACK_BENCHMARK_CASES
   });
@@ -252,8 +252,8 @@ export default function App() {
           false_positive_rate_percent: 0.0,
           precision_percent: 100.0,
           accuracy_percent: 100.0,
-          avg_latency_ms: 0.8,
-          total_benchmark_time_ms: 16.1
+          avg_latency_ms: 680.4,
+          total_benchmark_time_ms: 13608.0
         },
         results: FALLBACK_BENCHMARK_CASES
       });

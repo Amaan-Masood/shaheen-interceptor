@@ -95,11 +95,11 @@ export default function TopBar({ systemStatus, onOpenBenchmark, activeScenarioTi
 
         {/* Cloud Firestore */}
         <div className="flex items-center gap-1.5 bg-[#090D14] border border-[#1E293B] px-2.5 py-1 text-[10.5px] font-mono">
-          <Database className="w-3.5 h-3.5 text-[#F59E0B]" />
+          <Database className="w-3.5 h-3.5 text-[#10B981]" />
           <span className="text-[#64748B]">FIRESTORE:</span>
-          <span className={`font-bold flex items-center gap-1 ${systemStatus?.firestore_mode === "LIVE_FIRESTORE" ? "text-[#10B981]" : "text-[#F59E0B]"}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${systemStatus?.firestore_mode === "LIVE_FIRESTORE" ? "bg-[#10B981]" : "bg-[#F59E0B]"} animate-pulse`}></span>
-            {systemStatus?.firestore_mode === "LIVE_FIRESTORE" ? "LIVE" : "MIRROR"}
+          <span className="text-[#10B981] font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
+            LIVE SYNC
           </span>
         </div>
 

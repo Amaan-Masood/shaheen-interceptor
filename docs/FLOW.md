@@ -138,11 +138,11 @@ flowchart TD
     Agent1Exec --> CScore["Coercion Score: C (0 - 100)"]
     Agent2Exec --> MScore["Mule Risk Score: M (0 - 100)"]
 
-    CScore --> InstitutionalCheck{"Is Beneficiary Verified Institution?"}
+    CScore --> InstitutionalCheck{"Verified Institution AND M < 20 AND C < 25?"}
     MScore --> InstitutionalCheck
 
-    InstitutionalCheck -->|"Yes (Hospital / University)"| CleanCap["Cap Composite Score <= 5"]
-    InstitutionalCheck -->|"No"| WeightedCalc["Composite = 0.55 * C + 0.45 * M"]
+    InstitutionalCheck -->|"Yes (Clean Baseline Safe)"| CleanCap["Cap Composite Score <= 5"]
+    InstitutionalCheck -->|"No (Coerced or Mule Risk Detected)"| WeightedCalc["Composite = 0.55 * C + 0.45 * M"]
 
     CleanCap --> FinalCheck{"Composite Score"}
     WeightedCalc --> SmurfCheck{"Is Mule Risk M >= 50?"}
