@@ -137,7 +137,7 @@ export default function ScenarioSimulator({
           </div>
 
           {/* Transcript Dialogue Scrollview */}
-          <div className="space-y-2.5 overflow-y-auto flex-1 pr-1 max-h-56">
+          <div className="space-y-2.5 overflow-y-auto flex-1 pr-1 min-h-[160px]">
             {transcriptLines.map((line, idx) => {
               const text = typeof line === "string" ? line : line?.text || "";
               const speaker = typeof line === "object" && line?.speaker ? line.speaker : "TRANSCRIPT";
@@ -166,7 +166,13 @@ export default function ScenarioSimulator({
                       {speaker === "PERPETRATOR" ? "Caller (Inspector Tariq — Scammer)" : speaker}
                     </span>
                     {tag && (
-                      <span className="text-[9px] font-bold bg-[#EF4444] text-white px-2 py-0.5 rounded-full shadow-sm tracking-wider uppercase">
+                      <span
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm tracking-wider uppercase ${
+                          isClean || tag.includes("VERIFIED") || tag.includes("GENUINE")
+                            ? "bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30"
+                            : "bg-[#EF4444] text-white"
+                        }`}
+                      >
                         {tag.replace(/_/g, " ")}
                       </span>
                     )}
