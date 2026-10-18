@@ -29,8 +29,8 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
   const datasetInfo = benchmarkData?.dataset;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#0A0D14] border border-[#EF4444]/60 w-full max-w-5xl max-h-[90vh] flex flex-col font-mono text-xs shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4">
+      <div className="bg-[#090E1A]/95 border border-white/15 w-full max-w-5xl max-h-[90vh] flex flex-col font-mono text-xs shadow-2xl rounded-3xl overflow-hidden backdrop-blur-2xl">
         {/* Modal Header */}
         <div className="p-3.5 bg-[#07090E] border-b border-[#1E293B] flex items-center justify-between">
           <div className="flex items-center gap-2.5">

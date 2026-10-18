@@ -1,305 +1,303 @@
 import React, { useState } from "react";
-import { GitCommit, AlertOctagon, Smartphone, Shield, ArrowRight, Layers, Info, Crosshair, Zap } from "lucide-react";
+import { GitCommit, ArrowRight, Layers, ShieldCheck, AlertOctagon, ExternalLink, CheckCircle2, ChevronRight, Landmark, CreditCard, Ban, Shield, Sparkles } from "lucide-react";
 
 export default function NetworkGraph({ topology, isClean }) {
+  const [viewMode, setViewMode] = useState("FLOW"); // "FLOW" | "MAP"
   const [selectedNode, setSelectedNode] = useState(null);
 
-  if (!topology || !topology.nodes || topology.nodes.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-[#64748B] font-mono text-xs">
-        <GitCommit className="w-8 h-8 mb-2 animate-spin text-[#EF4444]" />
-        <span>AWAITING TRANSACTION INTERCEPTION TO CONSTRUCT GRAPH...</span>
-      </div>
-    );
-  }
+  const nodes = Array.isArray(topology?.nodes) ? topology.nodes : [];
+  const edges = Array.isArray(topology?.edges) ? topology.edges : [];
 
-  const { nodes, edges } = topology;
-
-  // Compute node coordinates map
+  // Compute normalized node coordinates for SVG viewBox="0 0 840 360"
   const nodeMap = {};
   nodes.forEach((n, idx) => {
-    const x = n.x !== undefined ? n.x : 120 + ((idx % 4) * 190);
-    const y = n.y !== undefined ? n.y : 140 + (Math.floor(idx / 4) * 140);
-    nodeMap[n.id] = { ...n, x, y };
+    let x = n?.x !== undefined ? n.x : 100 + ((idx % 4) * 190);
+    let y = n?.y !== undefined ? n.y : 130 + (Math.floor(idx / 4) * 120);
+
+    // Compress and scale rightward nodes into the canvas safely
+    if (x >= 700) x = 680;
+    else if (x >= 500) x = 480;
+    else if (x >= 300) x = 290;
+    else x = 90;
+
+    nodeMap[n?.id || idx] = { ...n, x, y };
   });
 
   return (
-    <div className="relative w-full h-full bg-[#05070B] flex flex-col font-mono text-xs">
-      {/* Top Controls & Tactical Telemetry Bar */}
-      <div className="flex flex-wrap items-center justify-between border-b border-[#1E293B] bg-[#090D14] px-3.5 py-2 text-[10px] text-[#94A3B8]">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-white font-bold">
-            <Layers className="w-3.5 h-3.5 text-[#38BDF8]" />
-            3-HOP MONEY MULE TOPOLOGY (FIRESTORE)
-          </span>
-          <span className="text-[#38BDF8] font-bold">NODES: {nodes.length}</span>
-          <span className="text-[#F59E0B] font-bold">EDGES: {edges.length}</span>
-          <span className="text-[#64748B] hidden md:inline">RADAR: LAT 33.6844° N / LON 73.0479° E</span>
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center gap-3 text-[9.5px]">
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 bg-[#38BDF8] border border-[#38BDF8]" />
-            <span>ORIGINATOR</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 bg-[#EF4444] border border-[#EF4444] animate-pulse" />
-            <span>MULE NODE</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 bg-[#F59E0B] border border-[#F59E0B]" />
-            <span>CRYPTO / ATM</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 bg-[#10B981] border border-[#10B981]" />
-            <span>INSTITUTION</span>
-          </div>
-        </div>
-      </div>
-
-      {/* SVG Canvas Area */}
-      <div className="relative flex-1 w-full h-[360px] md:h-[480px] bg-[#05070B] overflow-hidden">
-        {/* Tactical Background Grid */}
-        <div
-          className="absolute inset-0 opacity-15 pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(#334155 1px, transparent 1px)`,
-            backgroundSize: "28px 28px"
-          }}
-        />
-
-        <svg viewBox="0 0 840 440" className="w-full h-full select-none">
-          <defs>
-            {/* Glow Filter */}
-            <filter id="glow-red" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-            <filter id="glow-green" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            {/* Arrow markers */}
-            <marker
-              id="arrow-red"
-              viewBox="0 0 10 10"
-              refX="19"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#EF4444" />
-            </marker>
-            <marker
-              id="arrow-green"
-              viewBox="0 0 10 10"
-              refX="19"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981" />
-            </marker>
-          </defs>
-
-          {/* Tactical Crosshairs at Corners */}
-          <text x="18" y="24" fill="#334155" fontSize="14" fontFamily="monospace">+</text>
-          <text x="815" y="24" fill="#334155" fontSize="14" fontFamily="monospace">+</text>
-          <text x="18" y="425" fill="#334155" fontSize="14" fontFamily="monospace">+</text>
-          <text x="815" y="425" fill="#334155" fontSize="14" fontFamily="monospace">+</text>
-
-          {/* Edges with Animated Flow Vectors */}
-          {edges.map((edge, idx) => {
-            const source = nodeMap[edge.source];
-            const target = nodeMap[edge.target];
-            if (!source || !target) return null;
-
-            const isCleanEdge = isClean || edge.flag?.includes("INSTITUTIONAL");
-            const strokeColor = isCleanEdge ? "#10B981" : "#EF4444";
-            const midX = (source.x + target.x) / 2;
-            const midY = (source.y + target.y) / 2 - 9;
-
-            return (
-              <g key={idx}>
-                {/* Background Line */}
-                <line
-                  x1={source.x}
-                  y1={source.y}
-                  x2={target.x}
-                  y2={target.y}
-                  stroke={strokeColor}
-                  strokeWidth="2.5"
-                  strokeOpacity="0.4"
-                />
-                {/* Flow Animated Line */}
-                <line
-                  x1={source.x}
-                  y1={source.y}
-                  x2={target.x}
-                  y2={target.y}
-                  stroke={strokeColor}
-                  strokeWidth="2"
-                  className={isCleanEdge ? "" : "flow-animated"}
-                  filter={isCleanEdge ? "url(#glow-green)" : "url(#glow-red)"}
-                  markerEnd={isCleanEdge ? "url(#arrow-green)" : "url(#arrow-red)"}
-                />
-                {/* Edge Amount Badge */}
-                <rect
-                  x={midX - 42}
-                  y={midY - 9}
-                  width="84"
-                  height="18"
-                  fill="#05070B"
-                  stroke={strokeColor}
-                  strokeWidth="1.2"
-                  className="opacity-95"
-                />
-                <text
-                  x={midX}
-                  y={midY + 4}
-                  fill={strokeColor}
-                  fontSize="9.5"
-                  fontFamily="monospace"
-                  fontWeight="bold"
-                  textAnchor="middle"
-                >
-                  {edge.amount}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* Nodes */}
-          {nodes.map((node) => {
-            const isSelected = selectedNode?.id === node.id;
-            const isVictim = node.type === "VICTIM";
-            const isMule = node.type?.includes("MULE") || node.type === "FEEDER";
-            const isExit = node.type?.includes("EXIT") || node.type?.includes("CRYPTO");
-            const isInst = node.type?.includes("INSTITUTION");
-
-            let nodeColor = "#EF4444";
-            if (isVictim) nodeColor = "#38BDF8";
-            else if (isInst) nodeColor = "#10B981";
-            else if (isExit) nodeColor = "#F59E0B";
-
-            return (
-              <g
-                key={node.id}
-                onClick={() => setSelectedNode(node)}
-                className="cursor-pointer group"
-                transform={`translate(${node.x}, ${node.y})`}
-              >
-                {/* Outer Concentric Threat Pulse Rings for Mule Nodes */}
-                {isMule && !isClean && (
-                  <>
-                    <circle
-                      r="28"
-                      fill="none"
-                      stroke="#EF4444"
-                      strokeWidth="1.2"
-                      className="animate-ping opacity-35"
-                    />
-                    <circle
-                      r="20"
-                      fill="none"
-                      stroke="#EF4444"
-                      strokeWidth="1.5"
-                      strokeDasharray="3 3"
-                      className="opacity-60"
-                    />
-                  </>
-                )}
-
-                {/* Base Outer Ring */}
-                <circle
-                  r="16"
-                  fill="#090D14"
-                  stroke={isSelected ? "#FFFFFF" : nodeColor}
-                  strokeWidth={isSelected ? "3" : "2"}
-                  className="transition-all group-hover:scale-115 drop-shadow-md"
-                />
-
-                {/* Inner Node Core */}
-                <circle
-                  r="6.5"
-                  fill={nodeColor}
-                  filter={isClean ? "url(#glow-green)" : "url(#glow-red)"}
-                />
-
-                {/* Node Label Text */}
-                <text
-                  y="27"
-                  fill="#FFFFFF"
-                  fontSize="10"
-                  fontFamily="monospace"
-                  fontWeight="bold"
-                  textAnchor="middle"
-                  className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                >
-                  {node.label.length > 20 ? node.label.slice(0, 18) + "..." : node.label}
-                </text>
-                <text
-                  y="38"
-                  fill="#94A3B8"
-                  fontSize="8"
-                  fontFamily="monospace"
-                  textAnchor="middle"
-                  className="pointer-events-none font-medium"
-                >
-                  {node.bank || node.id}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* Node Telemetry Inspector Floating Drawer */}
-        {selectedNode && (
-          <div className="absolute bottom-3 left-3 right-3 bg-[#090D14]/95 border border-[#EF4444] p-3 font-mono text-xs backdrop-blur-md shadow-[0_0_25px_rgba(0,0,0,0.8)] flex flex-wrap items-center justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <AlertOctagon className="w-4 h-4 text-[#EF4444] animate-pulse" />
-                <span className="font-extrabold text-white uppercase text-sm">
-                  {selectedNode.label}
-                </span>
-                <span className="text-[10px] bg-[#EF4444]/20 text-[#EF4444] px-1.5 py-0.2 border border-[#EF4444]/50 font-bold">
-                  MULE RISK: {selectedNode.risk || 95}/100
-                </span>
+    <div className="bezel-shell p-2 rounded-3xl h-full flex flex-col">
+      <div className="bezel-core p-4 sm:p-5 rounded-[calc(1.5rem-0.25rem)] flex-1 flex flex-col space-y-4 overflow-hidden">
+        {/* Top Header & View Toggle */}
+        <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#38BDF8]/15 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8]">
+              <Layers className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="font-extrabold text-sm sm:text-base text-white tracking-tight font-display">
+                Money Trail — Where was the money going?
               </div>
-              <div className="text-[11px] text-[#94A3B8] flex flex-wrap items-center gap-4">
-                <span>ACCOUNT: <b className="text-white">{selectedNode.id}</b></span>
-                <span>INSTITUTION: <b className="text-white">{selectedNode.bank || "N/A"}</b></span>
-                <span>AGE: <b className="text-[#F59E0B]">{selectedNode.age || 4} DAYS</b></span>
-                <span>KYC: <b className="text-[#38BDF8]">{selectedNode.kyc || "Tier 0"}</b></span>
+              <div className="text-[11px] text-[#94A3B8]">
+                {isClean ? "Direct institutional clearance" : "Multi-hop structuring and off-ramp detection"}
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3 text-[11px]">
-              {selectedNode.device && (
-                <div className="flex items-center gap-1.5 bg-[#1F0E12] border border-[#EF4444]/50 px-2.5 py-1 text-[#EF4444]">
-                  <Smartphone className="w-3.5 h-3.5" />
-                  <span>SHARED FINGERPRINT: <b>{selectedNode.device}</b></span>
+          {/* View Switcher: Step Flow vs Node Map */}
+          <div className="flex items-center gap-1 bg-[#090F1C] p-1 rounded-full text-xs border border-white/[0.08] shadow-inner">
+            <button
+              type="button"
+              onClick={() => setViewMode("FLOW")}
+              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                viewMode === "FLOW"
+                  ? "bg-gradient-to-r from-[#1E293B] to-[#334155] text-white shadow-md"
+                  : "text-[#94A3B8] hover:text-white"
+              }`}
+            >
+              Step Flow
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("MAP")}
+              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
+                viewMode === "MAP"
+                  ? "bg-gradient-to-r from-[#1E293B] to-[#334155] text-white shadow-md"
+                  : "text-[#94A3B8] hover:text-white"
+              }`}
+            >
+              Network Map
+            </button>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto pr-1">
+          {viewMode === "FLOW" ? (
+            /* Luminous Step Flow */
+            <div className="space-y-3 max-w-2xl mx-auto py-1">
+              {isClean ? (
+                /* Clean Hospital Direct Flow */
+                <div className="rounded-2xl bg-[#0D1F17] border border-[#10B981]/40 p-5 space-y-4 shadow-xl relative overflow-hidden">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/40 flex items-center justify-center text-[#34D399] font-black text-sm">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-wider">Originator Account</div>
+                      <div className="font-bold text-white text-sm">Farhan Siddiqui (Standard Chartered)</div>
+                      <div className="text-xs text-[#94A3B8]">Verified Biometric Tier 2 • Regular Medical Savings</div>
+                    </div>
+                  </div>
+
+                  <div className="pl-5 border-l-2 border-[#10B981]/50 ml-5 py-2">
+                    <div className="bg-[#070D12] rounded-xl p-3 text-xs text-[#34D399] flex items-center justify-between border border-[#10B981]/25 shadow-inner">
+                      <span className="flex items-center gap-2">
+                        <ArrowRight className="w-4 h-4 text-[#10B981]" />
+                        <span>Raast Direct Transfer: <strong>Rs. 380,000</strong></span>
+                      </span>
+                      <span className="font-mono text-[10px] font-bold text-[#10B981] bg-[#10B981]/15 px-2.5 py-0.5 rounded-full border border-[#10B981]/30">
+                        CLEARED (3 SEC)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-[#10B981] text-black font-black flex items-center justify-center shadow-lg shadow-[#10B981]/30">
+                      <CheckCircle2 className="w-5 h-5 text-black" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[10px] text-[#34D399] font-bold uppercase tracking-wider">Verified Healthcare Destination</div>
+                      <div className="font-bold text-white text-sm">Shaukat Khanum Memorial Cancer Hospital</div>
+                      <div className="text-xs text-[#94A3B8]">Tier 3 Corporate Entity • Askari Bank Official Collection Account</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Multi-Hop Mule Scam Flow */
+                <div className="space-y-2.5">
+                  {/* Step 1: Victim Originator */}
+                  <div className="rounded-2xl bg-[#0D1526] border border-white/[0.08] p-4 flex items-center gap-3.5 shadow-md">
+                    <div className="w-10 h-10 rounded-2xl bg-[#38BDF8]/20 border border-[#38BDF8]/40 flex items-center justify-center text-[#38BDF8] font-black text-sm">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[10px] text-[#94A3B8] uppercase font-bold tracking-wider">Victim's Originating Account</div>
+                      <div className="font-bold text-white text-sm">Haji Abdul Rehman (Retired Officer)</div>
+                      <div className="text-xs text-[#94A3B8]">Attempted extortion deposit: Rs. 450,000 via Raast</div>
+                    </div>
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30">
+                      Victim
+                    </span>
+                  </div>
+
+                  {/* Flow Arrow */}
+                  <div className="flex justify-center -my-1 text-[#EF4444]">
+                    <ArrowRight className="w-4 h-4 rotate-90" />
+                  </div>
+
+                  {/* Step 2: Primary Mule Hub */}
+                  <div className="rounded-2xl bg-[#1F0E14] border border-[#EF4444]/60 p-4 flex items-center gap-3.5 shadow-xl shadow-[#EF4444]/10">
+                    <div className="w-10 h-10 rounded-2xl bg-[#EF4444] text-white flex items-center justify-center font-black text-sm shadow-md shadow-[#EF4444]/40">
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-[#F87171] uppercase font-bold tracking-wider">Primary Mule Hub</span>
+                        <span className="text-[9px] bg-[#EF4444] text-white px-2 py-0.2 rounded-full font-black">
+                          4 DAYS OLD
+                        </span>
+                      </div>
+                      <div className="font-bold text-white text-sm">Muhammad Bilal (Habib Bank Ltd)</div>
+                      <div className="text-xs text-[#FCA5A5]">First destination before rapid layering fan-out</div>
+                    </div>
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#EF4444]/25 text-[#F87171] border border-[#EF4444]/40">
+                      Mule Layer 1
+                    </span>
+                  </div>
+
+                  {/* Flow Arrow */}
+                  <div className="flex justify-center -my-1 text-[#A855F7]">
+                    <ArrowRight className="w-4 h-4 rotate-90" />
+                  </div>
+
+                  {/* Step 3: Structuring Fan-Out */}
+                  <div className="rounded-2xl bg-[#170E24] border border-[#A855F7]/50 p-4 flex items-center gap-3.5 shadow-md">
+                    <div className="w-10 h-10 rounded-2xl bg-[#A855F7]/25 border border-[#A855F7]/40 flex items-center justify-center text-[#C084FC] font-black text-sm">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[10px] text-[#C084FC] uppercase font-bold tracking-wider">Structuring Split (2 Secondary Accounts)</div>
+                      <div className="font-bold text-white text-sm">Kashif Mehmood & Hamza Tariq</div>
+                      <div className="text-xs text-[#94A3B8]">Rs. 225k & Rs. 220k split in 90 seconds to evade AML radar</div>
+                    </div>
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#A855F7]/20 text-[#C084FC] border border-[#A855F7]/30">
+                      Mules Layer 2
+                    </span>
+                  </div>
+
+                  {/* Flow Arrow */}
+                  <div className="flex justify-center -my-1 text-[#F59E0B]">
+                    <ArrowRight className="w-4 h-4 rotate-90" />
+                  </div>
+
+                  {/* Step 4: Final Cash-Out Points */}
+                  <div className="rounded-2xl bg-[#1C140A] border border-[#F59E0B]/60 p-4 flex items-center gap-3.5 shadow-xl shadow-[#F59E0B]/10">
+                    <div className="w-10 h-10 rounded-2xl bg-[#F59E0B] text-black flex items-center justify-center font-black text-sm shadow-md shadow-[#F59E0B]/30">
+                      4
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[10px] text-[#FBBF24] uppercase font-bold tracking-wider">Targeted Off-Ramp Liquidation</div>
+                      <div className="font-bold text-white text-sm">Binance P2P Escrow & Cash Over Counter</div>
+                      <div className="text-xs text-[#FDE68A]">Pre-settlement freeze prevented cash withdrawal from Rawalpindi ATM</div>
+                    </div>
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#F59E0B]/25 text-[#FBBF24] border border-[#F59E0B]/40">
+                      Off-Ramp
+                    </span>
+                  </div>
                 </div>
               )}
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1 font-bold cursor-pointer"
-              >
-                DISMISS
-              </button>
             </div>
-          </div>
-        )}
+          ) : (
+            /* Interactive Network Map (SVG Canvas) */
+            <div className="relative w-full h-[360px] rounded-2xl bg-[#070B14] border border-white/[0.08] overflow-hidden flex items-center justify-center">
+              <svg viewBox="0 0 840 360" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#38BDF8" />
+                    <stop offset="50%" stopColor="#EF4444" />
+                    <stop offset="100%" stopColor="#F59E0B" />
+                  </linearGradient>
+                </defs>
+
+                {/* Edges */}
+                {edges.map((edge, idx) => {
+                  const source = nodeMap[edge.source];
+                  const target = nodeMap[edge.target];
+                  if (!source || !target) return null;
+
+                  return (
+                    <g key={idx}>
+                      <line
+                        x1={source.x}
+                        y1={source.y}
+                        x2={target.x}
+                        y2={target.y}
+                        stroke="#EF4444"
+                        strokeWidth="2"
+                        className="flow-animated"
+                        opacity="0.8"
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* Nodes */}
+                {nodes.map((node, idx) => {
+                  const coords = nodeMap[node.id || idx];
+                  const isSuspicious = node.risk_score && node.risk_score > 50;
+
+                  return (
+                    <g
+                      key={idx}
+                      transform={`translate(${coords.x}, ${coords.y})`}
+                      className="cursor-pointer group"
+                      onClick={() => setSelectedNode(node)}
+                    >
+                      {/* Pulse Circle */}
+                      <circle
+                        r="22"
+                        fill={isSuspicious ? "rgba(239, 68, 68, 0.2)" : "rgba(56, 189, 248, 0.2)"}
+                        className="animate-ping"
+                      />
+                      {/* Core Circle */}
+                      <circle
+                        r="16"
+                        fill={isSuspicious ? "#EF4444" : "#1E293B"}
+                        stroke={isSuspicious ? "#F87171" : "#38BDF8"}
+                        strokeWidth="2"
+                      />
+                      <text
+                        y="4"
+                        textAnchor="middle"
+                        fill="#FFFFFF"
+                        fontSize="9"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                      >
+                        {node.id ? node.id.slice(0, 3) : idx + 1}
+                      </text>
+                      <text
+                        y="28"
+                        textAnchor="middle"
+                        fill="#94A3B8"
+                        fontSize="10"
+                        fontWeight="600"
+                      >
+                        {node.label || node.id}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {/* Node Inspector Drawer */}
+              {selectedNode && (
+                <div className="absolute bottom-3 left-3 right-3 p-3.5 rounded-xl bg-[#0B111E]/95 border border-white/20 backdrop-blur-md flex items-center justify-between text-xs">
+                  <div>
+                    <div className="font-bold text-white text-sm">{selectedNode.label || selectedNode.id}</div>
+                    <div className="text-[#94A3B8] text-[11px]">Type: {selectedNode.type || "Account"} • Bank: {selectedNode.bank || "Habib Bank Ltd"}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedNode(null)}
+                    className="text-xs bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1 rounded-lg"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

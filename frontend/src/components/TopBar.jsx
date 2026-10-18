@@ -1,31 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Cpu, Database, Sparkles, Activity, Radio } from "lucide-react";
+import { Shield, Sparkles, Activity, Clock, Lock, ArrowUpRight, CheckCircle2 } from "lucide-react";
 
-/* TopBar — header strip. Carries brand, live PKT/UTC clock, and the
-   infrastructure telemetry pills that show which engine is actually
-   making decisions right now (Cloud Run / Firestore / Gemini).
-
-   Deliberately quiet: no pulse animations on status dots, no neon
-   shadows, no military taglines. The pills are informational, not
-   performative — a judge glances here to verify the demo is wired to
-   a real backend, not to admire the aesthetic. */
-
-export default function TopBar({ systemStatus, onOpenBenchmark, activeScenarioTitle }) {
+export default function TopBar({ systemStatus, onOpenBenchmark }) {
   const [timeStr, setTimeStr] = useState("");
-  const [utcStr, setUtcStr] = useState("");
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       setTimeStr(
         now.toLocaleTimeString("en-US", {
+          timeZone: "Asia/Karachi",
           hour12: false,
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit"
         })
       );
-      setUtcStr(now.toISOString().substring(11, 19) + "Z");
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -33,109 +23,73 @@ export default function TopBar({ systemStatus, onOpenBenchmark, activeScenarioTi
   }, []);
 
   return (
-    <header className="w-full bg-[#0F172A] border-b border-[#1E293B] px-4 py-2.5 flex items-center justify-between gap-4 text-sm z-30 sticky top-0">
-      {/* Brand */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center justify-center w-8 h-8 rounded-md bg-[#111827] border border-[#334155]">
-          <svg viewBox="0 0 32 32" className="w-5 h-5" aria-hidden="true">
-            <path
-              d="M 16 3 L 8 9 L 4 17 L 11 16 L 16 29 L 21 16 L 28 17 L 24 9 Z"
-              fill="#DC2626"
-              fillOpacity="0.85"
-            />
-            <circle cx="16" cy="12" r="1.6" fill="#FFFFFF" />
-          </svg>
-        </div>
-        <div className="leading-tight">
-          <div className="text-sm font-semibold text-white tracking-wide">
-            SHAHEEN INTERCEPTOR
+    <header className="w-full bg-[#080D19]/80 backdrop-blur-xl border-b border-white/[0.08] px-4 sm:px-6 lg:px-8 py-3 z-30 sticky top-0 shadow-2xl">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Brand & Identity */}
+        <div className="flex items-center gap-3.5">
+          {/* Logo Squircle with specular highlight */}
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#EF4444] to-[#F59E0B] rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-[#1E1015] via-[#2A1118] to-[#120B0F] border border-[#EF4444]/40 text-white shadow-inner">
+              <Shield className="w-5 h-5 text-[#EF4444]" />
+            </div>
           </div>
-          <div className="text-[11px] text-[#64748B] tracking-tight">
-            Pre-settlement fraud defense
+
+          <div>
+            <div className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2 font-display">
+              <span>SHAHEEN</span>
+              <span className="text-[10px] uppercase font-extrabold tracking-widest px-2 py-0.5 rounded-full bg-[#EF4444]/15 text-[#F87171] border border-[#EF4444]/30">
+                SCAM SHIELD
+              </span>
+              <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-[#94A3B8] font-medium border-l border-white/10 pl-2.5">
+                <Lock className="w-3 h-3 text-[#10B981]" />
+                <span>SBP Raast Pre-Settlement Interlock</span>
+              </span>
+            </div>
+            <div className="text-xs text-[#94A3B8] flex items-center gap-2">
+              <span>National Multi-Agent Scam & Money Mule Defense Platform</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Live clocks */}
-      <div className="hidden xl:flex items-center gap-4 px-3 py-1 bg-[#111827] border border-[#1E293B] rounded text-[11px] font-mono tabular">
-        <div className="flex items-center gap-1.5 text-[#94A3B8]">
-          <span>PKT</span>
-          <span className="text-white font-medium">{timeStr || "—"}</span>
+        {/* Right Controls: Telemetry Clock, AI Engine & Benchmark */}
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Live PKT Clock */}
+          <div className="hidden lg:flex items-center gap-2 bg-[#0E1626]/80 border border-white/[0.08] rounded-full px-3.5 py-1.5 text-xs text-[#94A3B8] shadow-inner">
+            <Clock className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <span className="text-[11px] text-[#64748B] font-semibold">PKT:</span>
+            <span className="font-mono font-bold text-white tracking-wider">{timeStr || "LIVE"}</span>
+          </div>
+
+          {/* Engine Status Pill */}
+          <div className="flex items-center gap-2 bg-[#0E1626]/80 border border-white/[0.08] rounded-full px-3.5 py-1.5 text-xs text-[#E2E8F0] shadow-inner">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>
+            </span>
+            <span className="text-[#94A3B8] font-medium hidden sm:inline">Engine:</span>
+            <span className="font-semibold text-white flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <span className="hidden xs:inline">{systemStatus?.gemini_live ? "Gemini 2.5 Flash" : "Multi-Agent"}</span>
+              <span className="xs:hidden">Gemini</span>
+            </span>
+          </div>
+
+          {/* Benchmark Audit Button with Button-in-Button pattern */}
+          <button
+            type="button"
+            onClick={onOpenBenchmark}
+            className="group flex items-center gap-2 pl-3.5 pr-1.5 py-1.5 rounded-full bg-gradient-to-r from-[#172033] to-[#1E293B] hover:from-[#1E293B] hover:to-[#334155] text-white font-bold text-xs border border-white/15 transition-all cursor-pointer shadow-lg hover:shadow-cyan-500/10 active:scale-95"
+          >
+            <Activity className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <span className="hidden sm:inline">40-Case Audit</span>
+            <span className="sm:hidden">Audit</span>
+            <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-[#38BDF8] group-hover:text-black transition-all">
+              <ArrowUpRight className="w-3 h-3" />
+            </span>
+          </button>
         </div>
-        <span className="text-[#334155]">·</span>
-        <div className="flex items-center gap-1.5 text-[#94A3B8]">
-          <span>UTC</span>
-          <span className="text-white font-medium">{utcStr || "—"}</span>
-        </div>
-      </div>
-
-      {/* Infrastructure telemetry pills */}
-      <div className="flex items-center gap-2 flex-wrap justify-end">
-        {/* Cloud Run */}
-        <StatusPill
-          icon={<Cpu className="w-3.5 h-3.5" />}
-          iconColor="#64748B"
-          label="CLOUD RUN"
-          value={systemStatus?.cloud_run_environment === "active" ? "ACTIVE" : "IDLE"}
-          tone={systemStatus?.cloud_run_environment === "active" ? "ok" : "warn"}
-        />
-
-        {/* Firestore */}
-        <StatusPill
-          icon={<Database className="w-3.5 h-3.5" />}
-          iconColor="#64748B"
-          label="FIRESTORE"
-          value={systemStatus?.firestore_connected ? "LIVE SYNC" : "MIRROR"}
-          tone={systemStatus?.firestore_connected ? "ok" : "warn"}
-        />
-
-        {/* Gemini */}
-        <StatusPill
-          icon={<Sparkles className="w-3.5 h-3.5" />}
-          iconColor="#64748B"
-          label="GEMINI"
-          value={systemStatus?.gemini_live ? "FLASH LATEST" : "FALLBACK"}
-          tone={systemStatus?.gemini_live ? "ok" : "warn"}
-        />
-
-        {/* Benchmark trigger */}
-        <button
-          type="button"
-          onClick={onOpenBenchmark}
-          aria-label="Run held-out benchmark evaluation"
-          className="flex items-center gap-2 bg-[#111827] hover:bg-[#171F2E] text-white font-medium px-3 py-1.5 rounded border border-[#334155] text-xs transition-colors cursor-pointer active:scale-[0.98]"
-        >
-          <Activity className="w-3.5 h-3.5 text-[#64748B]" aria-hidden="true" />
-          <span>RUN HELD-OUT BENCHMARK</span>
-        </button>
       </div>
     </header>
-  );
-}
-
-/* Small status pill: single dot + label + value. Uses a slow 3s breathe
-   animation only when tone is 'ok' (live). Falls back to a static dot
-   when prefers-reduced-motion is set. No glow shadows. */
-function StatusPill({ icon, iconColor, label, value, tone }) {
-  const toneColors = {
-    ok: { dot: "#10B981", text: "#10B981" },
-    warn: { dot: "#F59E0B", text: "#F59E0B" },
-    idle: { dot: "#64748B", text: "#64748B" }
-  };
-  const colors = toneColors[tone] || toneColors.idle;
-
-  return (
-    <div className="flex items-center gap-1.5 bg-[#111827] border border-[#1E293B] rounded px-2 py-1 text-[11px] font-mono">
-      <span style={{ color: iconColor }}>{icon}</span>
-      <span className="text-[#64748B]">{label}</span>
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${tone === "ok" ? "live-dot" : ""}`}
-        style={{ backgroundColor: colors.dot }}
-        aria-hidden="true"
-      />
-      <span className="font-semibold" style={{ color: colors.text }}>
-        {value}
-      </span>
-    </div>
   );
 }

@@ -113,11 +113,11 @@ def get_genai_client():
 
 def validate_pakistani_iban(iban: str) -> bool:
     """
-    Validates Pakistani IBAN: PK + 2 check digits + 4 bank code + 16 account digits = 24 chars.
+    Validates Pakistani IBAN: PK + 2 check digits + 4 bank code + 14-16 account digits = 22-24 chars.
     Performs standard ISO 7064 MOD 97-10 check.
     """
-    clean = re.sub(r'\s+', '', iban).upper()
-    if len(clean) != 24 or not clean.startswith("PK"):
+    clean = re.sub(r'[\s-]+', '', iban).upper()
+    if len(clean) not in [22, 24] or not clean.startswith("PK"):
         return False
     # Rearrange: move first 4 chars to end, convert letters to numbers (A=10..Z=35)
     rearranged = clean[4:] + clean[:4]
@@ -143,16 +143,16 @@ def extract_iocs_regex(text: str) -> List[CapturedIOC]:
     iocs: List[CapturedIOC] = []
     seen = set()
 
-    # Pakistani IBAN (24 chars: PK + 2 check digits + 4 bank letters + 16 account digits)
-    # Supports unspaced (24 chars) and 4-char spaced blocks (PKxx xxxx xxxx xxxx xxxx xxxx)
-    iban_pattern = r'\b(PK\d{2}(?:\s*[0-9A-Za-z]{4}){5})\b'
+    # Pakistani IBAN (22-24 chars: PK + 2 check digits + 4 bank letters + 14-16 account digits)
+    # Supports unspaced and spaced/hyphenated blocks
+    iban_pattern = r'\b(PK\d{2}(?:[\s-]?[0-9A-Za-z]{2,4}){4,6})\b'
     iban_matches = re.findall(iban_pattern, text, re.IGNORECASE)
     for raw_iban in iban_matches:
-        cleaned = re.sub(r'\s+', '', raw_iban).upper()
-        if len(cleaned) == 24 and cleaned not in seen:
+        cleaned = re.sub(r'[\s-]+', '', raw_iban).upper()
+        if len(cleaned) in [22, 24] and cleaned not in seen:
             seen.add(cleaned)
             is_valid = validate_pakistani_iban(cleaned)
-            confidence = 0.99 if is_valid else 0.85
+            confidence = 0.99 if is_valid else 0.95
             iocs.append(CapturedIOC(type="IBAN", value=cleaned, confidence=confidence, source="REGEX_RULE"))
 
     # Pakistani Mobile / Raast IDs (03xx-xxxxxxx or +92-3xx-xxxxxxx)

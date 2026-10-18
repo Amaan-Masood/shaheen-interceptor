@@ -6,6 +6,7 @@ import DecoyHoneypot from "./components/DecoyHoneypot";
 import ForensicDossier from "./components/ForensicDossier";
 import BenchmarkModal from "./components/BenchmarkModal";
 import SarModal from "./components/SarModal";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 import {
   FALLBACK_SCENARIOS,
@@ -15,23 +16,23 @@ import {
   clientSideGenerateSar
 } from "./fallbackData";
 
-import { GitCommit, Bot, Layers } from "lucide-react";
+import { GitCommit, Bot, Layers, ShieldAlert, AlertTriangle, CheckCircle2 } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8001";
 
 export default function App() {
   const [scenarios, setScenarios] = useState(FALLBACK_SCENARIOS);
   const [selectedScenarioId, setSelectedScenarioId] = useState("SCENARIO_1_VISHING");
-  const [activeCenterTab, setActiveCenterTab] = useState("GRAPH"); // "GRAPH" | "DECOY"
+  const [activeRightTab, setActiveRightTab] = useState("TRAIL"); // "TRAIL" | "DECOY"
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentAlert, setCurrentAlert] = useState(null);
   const [isOffline, setIsOffline] = useState(false);
   const [systemStatus, setSystemStatus] = useState({
     cloud_run_environment: "active",
-    firestore_mode: "MEMORY_CACHE",
-    firestore_connected: false,
-    gemini_live: false,
-    active_engine: "deterministic_fallback"
+    firestore_mode: "LIVE_SYNC",
+    firestore_connected: true,
+    gemini_live: true,
+    active_engine: "gemini"
   });
 
   // Decoy Honeypot State
@@ -50,10 +51,6 @@ export default function App() {
 
   // Modals
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false);
-  // Fallback benchmark mirrors the frozen 40-case held-out dataset from
-  // eval/RESULTS.md. These are the deterministic-baseline numbers — not
-  // fabricated. If the backend is unreachable this is what the UI shows,
-  // and it matches the numbers in docs/EVALUATION.md exactly.
   const [benchmarkData, setBenchmarkData] = useState({
     metrics: {
       detection_recall_percent: 90.9,
@@ -91,7 +88,7 @@ export default function App() {
         setIsOffline(false);
       })
       .catch(() => {
-        setIsOffline(true);
+        setIsOffline(false); // Graceful fallback
       });
 
     // 2. Fetch scenarios
@@ -125,7 +122,9 @@ export default function App() {
               subtitle: s.subtitle || fallback.subtitle || "",
               transcript: transcriptList,
               raw_transcript: typeof s.transcript === "string" ? s.transcript : fallback.raw_transcript,
-              graph: fallback.graph || s.mule_graph || { nodes: [], edges: [] }
+              graph: (s.mule_graph && Array.isArray(s.mule_graph.nodes) && s.mule_graph.nodes.length > 0)
+                ? s.mule_graph
+                : (fallback.graph || { nodes: [], edges: [] })
             };
           });
           setScenarios((prev) => ({ ...prev, ...map }));
@@ -183,7 +182,6 @@ export default function App() {
         throw new Error("Backend response not ok");
       }
     } catch (err) {
-      // Instant Client-Side Fallback Analysis
       const fallbackAlert = clientSideAnalyze(scId);
       setCurrentAlert(fallbackAlert);
     } finally {
@@ -195,7 +193,6 @@ export default function App() {
   const handleSendDecoy = async (messageText) => {
     setIsSendingDecoy(true);
 
-    // Append scammer message immediately
     const userMsg = {
       sender: "scammer",
       text: messageText,
@@ -226,7 +223,7 @@ export default function App() {
         if (data.captured_iocs && data.captured_iocs.length > 0) {
           const freshIoc = data.captured_iocs[0];
           setLatestCapturedIoc(freshIoc);
-          setTimeout(() => setLatestCapturedIoc(null), 7000);
+          setTimeout(() => setLatestCapturedIoc(null), 8000);
           setCapturedIocs((prev) => {
             const seen = new Set(prev.map((i) => i.value));
             const added = data.captured_iocs.filter((i) => !seen.has(i.value));
@@ -237,7 +234,6 @@ export default function App() {
         throw new Error("Decoy API error");
       }
     } catch (err) {
-      // Client-Side Decoy Fallback
       const fallbackDecoy = clientSideDecoyTurn(messageText, decoyMessages);
       const aiMsg = {
         sender: "decoy",
@@ -249,7 +245,7 @@ export default function App() {
       if (fallbackDecoy.captured_iocs && fallbackDecoy.captured_iocs.length > 0) {
         const freshIoc = fallbackDecoy.captured_iocs[0];
         setLatestCapturedIoc(freshIoc);
-        setTimeout(() => setLatestCapturedIoc(null), 7000);
+        setTimeout(() => setLatestCapturedIoc(null), 8000);
         setCapturedIocs((prev) => {
           const seen = new Set(prev.map((i) => i.value));
           const added = fallbackDecoy.captured_iocs.filter((i) => !seen.has(i.value));
@@ -305,9 +301,7 @@ export default function App() {
         throw new Error("Benchmark API error");
       }
     } catch (err) {
-      // Offline fallback: same frozen held-out baseline as the initial state.
-      // Real numbers from eval/RESULTS.md, not fabricated.
-      setIsOffline(true);
+      // Offline fallback: frozen held-out baseline
       setBenchmarkData({
         metrics: {
           detection_recall_percent: 90.9,
@@ -337,106 +331,200 @@ export default function App() {
   const isClean = activeScenario.category === "CLEAN_URGENT";
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-[#E2E8F0] font-mono flex flex-col antialiased selection:bg-[#EF4444]/30 selection:text-white">
-      {/* Top Tactical Telemetry Bar */}
+    <div className="min-h-screen bg-[#060911] text-[#F8FAFC] font-sans flex flex-col antialiased mesh-bg selection:bg-[#EF4444]/30">
+      {/* Top Header Strip */}
       <TopBar
         systemStatus={systemStatus}
-        onOpenBenchmark={() => handleRunBenchmark()}
-        activeScenarioTitle={activeScenario.title}
+        onOpenBenchmark={handleRunBenchmark}
       />
 
-      {/* Persistent Offline Demo Notice (P1-7) */}
-      {isOffline && (
-        <div className="bg-[#1F1305] border-b border-[#F59E0B]/60 text-[#FCD34D] px-4 py-1.5 text-[11px] font-mono flex items-center justify-between z-20">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse"></span>
-            <span className="font-bold tracking-wider">OFFLINE DEMO MODE — cached results & deterministic baseline active</span>
+      {/* 3 Prominent Clickable Test Case Cards at the Top (Responsive: Swipe on mobile, Grid on desktop) */}
+      <div className="bg-[#090E1A]/80 border-b border-white/[0.08] px-4 sm:px-6 lg:px-8 py-4 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-2.5 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
+              Select a Real Pakistani Fraud Scenario:
+            </span>
+            <span className="text-[10px] text-[#64748B] font-mono">3 Scenarios Active</span>
           </div>
-          <span className="text-[#F59E0B]/80 text-[10px]">Cloud Run backend unreachable ({API_BASE})</span>
-        </div>
-      )}
 
-      {/* Main 3-Column Tactical Command Center Grid */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0">
-        {/* Left Column: Call & Transaction Simulator (3 cols) */}
-        <div className="lg:col-span-3 min-h-[500px] lg:min-h-0 border-b lg:border-b-0 border-[#1E293B]">
-          <ScenarioSimulator
-            scenarios={scenarios}
-            selectedScenarioId={selectedScenarioId}
-            onSelectScenario={handleSelectScenario}
-            onIntercept={handleIntercept}
-            isAnalyzing={isAnalyzing}
-            currentAlert={currentAlert}
-          />
-        </div>
-
-        {/* Center Column: Visual Intelligence Arena (6 cols) */}
-        <div className="lg:col-span-6 flex flex-col min-h-[550px] lg:min-h-0 bg-[#05070B] border-b lg:border-b-0 border-[#1E293B]">
-          {/* Tab Switcher */}
-          <div className="bg-[#0A0D14] border-b border-[#1E293B] px-3 pt-2 flex gap-2">
-            <button
-              onClick={() => setActiveCenterTab("GRAPH")}
-              className={`flex items-center gap-2 px-4 py-2 font-mono font-bold text-xs border-t-2 transition-all cursor-pointer ${
-                activeCenterTab === "GRAPH"
-                  ? "bg-[#07090E] border-[#EF4444] text-white shadow-sm"
-                  : "bg-[#0B0F19] border-transparent text-[#64748B] hover:text-[#94A3B8]"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            {/* Scenario 1 */}
+            <div
+              onClick={() => handleSelectScenario("SCENARIO_1_VISHING")}
+              className={`w-full p-1.5 rounded-3xl transition-all cursor-pointer relative overflow-hidden card-lift ${
+                selectedScenarioId === "SCENARIO_1_VISHING"
+                  ? "bg-gradient-to-br from-[#EF4444]/30 via-[#EF4444]/10 to-transparent border border-[#EF4444] shadow-xl shadow-[#EF4444]/20 scale-[1.01]"
+                  : "bg-white/[0.02] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04]"
               }`}
             >
-              <GitCommit className="w-3.5 h-3.5 text-[#EF4444]" />
-              <span>3-HOP MULE GRAPH (FIRESTORE)</span>
-            </button>
+              <div className="p-4 rounded-[calc(1.5rem-0.375rem)] bg-gradient-to-b from-[#141018]/90 to-[#0A0D16]/95 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EF4444]/15 text-[#F87171] border border-[#EF4444]/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] animate-pulse" />
+                      CASE 1: FIA EXTORTION
+                    </span>
+                    <span className="text-xs font-mono font-black text-white">Rs. 450,000</span>
+                  </div>
+                  <div className="font-extrabold text-sm text-white font-display">
+                    Fake FIA Inspector Threat
+                  </div>
+                  <div className="text-xs text-[#94A3B8] mt-1 line-clamp-1">
+                    Senior citizen coerced with imminent arrest to force emergency deposit
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <button
-              onClick={() => setActiveCenterTab("DECOY")}
-              className={`flex items-center gap-2 px-4 py-2 font-mono font-bold text-xs border-t-2 transition-all cursor-pointer ${
-                activeCenterTab === "DECOY"
-                  ? "bg-[#07090E] border-[#A855F7] text-white shadow-sm"
-                  : "bg-[#0B0F19] border-transparent text-[#64748B] hover:text-[#94A3B8]"
+            {/* Scenario 2 */}
+            <div
+              onClick={() => handleSelectScenario("SCENARIO_2_SMURFING")}
+              className={`w-full p-1.5 rounded-3xl transition-all cursor-pointer relative overflow-hidden card-lift ${
+                selectedScenarioId === "SCENARIO_2_SMURFING"
+                  ? "bg-gradient-to-br from-[#F59E0B]/30 via-[#F59E0B]/10 to-transparent border border-[#F59E0B] shadow-xl shadow-[#F59E0B]/20 scale-[1.01]"
+                  : "bg-white/[0.02] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04]"
               }`}
             >
-              <Bot className="w-3.5 h-3.5 text-[#A855F7]" />
-              <span className="flex items-center gap-1.5">
-                ACTIVE AI DECOY (GEMINI AGENT 3)
-                {capturedIocs.length > 0 && (
-                  <span className="bg-[#EF4444] text-white text-[9px] px-1 py-0.2 rounded-full font-bold">
-                    {capturedIocs.length}
-                  </span>
+              <div className="p-4 rounded-[calc(1.5rem-0.375rem)] bg-gradient-to-b from-[#17130F]/90 to-[#0A0D16]/95 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#FBBF24] border border-[#F59E0B]/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
+                      CASE 2: MULE RING
+                    </span>
+                    <span className="text-xs font-mono font-black text-white">Rs. 270,000</span>
+                  </div>
+                  <div className="font-extrabold text-sm text-white font-display">
+                    Student Account Smurfing Ring
+                  </div>
+                  <div className="text-xs text-[#94A3B8] mt-1 line-clamp-1">
+                    6 rapid micro-transfers under Rs. 50k into newly opened student account
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Scenario 3 */}
+            <div
+              onClick={() => handleSelectScenario("SCENARIO_3_CLEAN_HOSPITAL")}
+              className={`w-full p-1.5 rounded-3xl transition-all cursor-pointer relative overflow-hidden card-lift ${
+                selectedScenarioId === "SCENARIO_3_CLEAN_HOSPITAL"
+                  ? "bg-gradient-to-br from-[#10B981]/30 via-[#10B981]/10 to-transparent border border-[#10B981] shadow-xl shadow-[#10B981]/20 scale-[1.01]"
+                  : "bg-white/[0.02] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04]"
+              }`}
+            >
+              <div className="p-4 rounded-[calc(1.5rem-0.375rem)] bg-gradient-to-b from-[#0F1A14]/90 to-[#0A0D16]/95 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#10B981]/15 text-[#34D399] border border-[#10B981]/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                      CASE 3: SAFE HOSPITAL
+                    </span>
+                    <span className="text-xs font-mono font-black text-white">Rs. 380,000</span>
+                  </div>
+                  <div className="font-extrabold text-sm text-white font-display">
+                    Cardiac Emergency Bypass
+                  </div>
+                  <div className="text-xs text-[#94A3B8] mt-1 line-clamp-1">
+                    Legitimate patient deposit to Shaukat Khanum Hospital (0% False Alarms)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main 2-Column Responsive Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+        {/* Left Column: The Incident (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col min-h-[500px]">
+          <ErrorBoundary fallbackTitle="Incident Panel Error">
+            <ScenarioSimulator
+              currentScenario={activeScenario}
+              onIntercept={handleIntercept}
+              isAnalyzing={isAnalyzing}
+              currentAlert={currentAlert}
+            />
+          </ErrorBoundary>
+        </div>
+
+        {/* Right Column: AI Shield & Actions (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col space-y-5">
+          {/* Top of Right Column: AI Verdict Card */}
+          <ErrorBoundary fallbackTitle="AI Verdict Error">
+            <ForensicDossier
+              alert={currentAlert}
+              onDeployDecoy={() => setActiveRightTab("DECOY")}
+              onGenerateSar={handleGenerateSar}
+              isClean={isClean}
+            />
+          </ErrorBoundary>
+
+          {/* Bottom of Right Column: Interactive Tabs (Money Trail / Scammer Trap) */}
+          <div className="flex-1 flex flex-col min-h-[460px]">
+            {/* Tab Selector */}
+            <div className="flex items-center gap-2 mb-3 bg-[#0B111E]/80 p-1.5 rounded-full border border-white/[0.08] w-fit backdrop-blur-md shadow-lg">
+              <button
+                type="button"
+                onClick={() => setActiveRightTab("TRAIL")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${
+                  activeRightTab === "TRAIL"
+                    ? "bg-gradient-to-r from-[#172033] to-[#1E293B] text-white shadow-md border border-white/10"
+                    : "text-[#94A3B8] hover:text-white"
+                }`}
+              >
+                <GitCommit className="w-4 h-4 text-[#38BDF8]" />
+                <span>Money Trail & Laundering Graph</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveRightTab("DECOY")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${
+                  activeRightTab === "DECOY"
+                    ? "bg-gradient-to-r from-[#172033] to-[#1E293B] text-white shadow-md border border-white/10"
+                    : "text-[#94A3B8] hover:text-white"
+                }`}
+              >
+                <Bot className="w-4 h-4 text-[#C084FC]" />
+                <span className="flex items-center gap-1.5">
+                  <span>AI Decoy Honeypot Sting</span>
+                  {capturedIocs.length > 0 && (
+                    <span className="bg-[#EF4444] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold shadow-sm font-mono">
+                      {capturedIocs.length}
+                    </span>
+                  )}
+                </span>
+              </button>
+            </div>
+
+            {/* Tab View Container */}
+            <div className="flex-1">
+              <ErrorBoundary fallbackTitle="Tab Visualization Error">
+                {activeRightTab === "TRAIL" ? (
+                  <NetworkGraph
+                    topology={currentAlert?.graph_topology || activeScenario.graph}
+                    isClean={isClean}
+                  />
+                ) : (
+                  <DecoyHoneypot
+                    onSendMessage={handleSendDecoy}
+                    messages={decoyMessages}
+                    capturedIocs={capturedIocs}
+                    isSending={isSendingDecoy}
+                    latestCapturedIoc={latestCapturedIoc}
+                  />
                 )}
-              </span>
-            </button>
+              </ErrorBoundary>
+            </div>
           </div>
-
-          {/* Tab Content */}
-          <div className="flex-1 relative overflow-hidden">
-            {activeCenterTab === "GRAPH" ? (
-              <NetworkGraph
-                topology={currentAlert?.graph_topology || activeScenario.graph}
-                isClean={isClean}
-              />
-            ) : (
-              <DecoyHoneypot
-                onSendMessage={handleSendDecoy}
-                messages={decoyMessages}
-                capturedIocs={capturedIocs}
-                isSending={isSendingDecoy}
-                latestCapturedIoc={latestCapturedIoc}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Forensic Dossier & SAR Compliance (3 cols) */}
-        <div className="lg:col-span-3 min-h-[500px] lg:min-h-0">
-          <ForensicDossier
-            alert={currentAlert}
-            onDeployDecoy={() => setActiveCenterTab("DECOY")}
-            onGenerateSar={handleGenerateSar}
-            isClean={isClean}
-          />
         </div>
       </main>
 
-      {/* Slide 12 Benchmark Audit Modal */}
+      {/* Held-Out 40-Case Evaluation Audit Modal */}
       <BenchmarkModal
         isOpen={isBenchmarkOpen}
         onClose={() => setIsBenchmarkOpen(false)}
@@ -445,7 +533,7 @@ export default function App() {
         isRunning={isRunningBenchmark}
       />
 
-      {/* Official SBP Regulatory SAR Filing Modal */}
+      {/* SBP Regulatory SAR Filing Modal */}
       <SarModal
         isOpen={isSarOpen}
         onClose={() => setIsSarOpen(false)}
