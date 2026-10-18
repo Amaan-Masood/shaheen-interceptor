@@ -9,8 +9,16 @@ export default function ScenarioSimulator({
   isAnalyzing,
   currentAlert
 }) {
-  const currentScenario = scenarios[selectedScenarioId] || scenarios.SCENARIO_1_VISHING;
+  const currentScenario = scenarios[selectedScenarioId] || scenarios.SCENARIO_1_VISHING || {};
   const isClean = currentScenario.category === "CLEAN_URGENT";
+
+  const transcriptLines = Array.isArray(currentScenario.transcript)
+    ? currentScenario.transcript
+    : Array.isArray(currentScenario.transcript_snippets)
+    ? currentScenario.transcript_snippets
+    : typeof currentScenario.transcript === "string" && currentScenario.transcript.trim()
+    ? [{ speaker: "PERPETRATOR", text: currentScenario.transcript, tag: "COERCION_STREAM" }]
+    : [];
 
   return (
     <div className="flex flex-col h-full bg-[#05070B] border-r border-[#1E293B] overflow-y-auto">
@@ -175,8 +183,8 @@ export default function ScenarioSimulator({
           </div>
 
           <div className="max-h-56 overflow-y-auto space-y-2 pr-1 text-xs">
-            {currentScenario.transcript.map((line, idx) => {
-              const isPerpetrator = line.speaker === "PERPETRATOR" || line.speaker.includes("SYNDICATE");
+            {transcriptLines.map((line, idx) => {
+              const isPerpetrator = line.speaker === "PERPETRATOR" || (typeof line.speaker === "string" && line.speaker.includes("SYNDICATE"));
               const isFlagged = Boolean(line.tag);
 
               return (

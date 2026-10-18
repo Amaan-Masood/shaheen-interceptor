@@ -26,6 +26,14 @@ BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "bac
 if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
+# Repository root - used so output paths are portable regardless of CWD.
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# Scratch output directory. Gitignored, so routine verification runs never add
+# or overwrite files inside the committed eval/ evidence record.
+SCRATCH_DIR = "eval_results_uncommitted"
+COMMIT_DIR = "eval"
+
 try:
     from pipeline import evaluate_transaction
     from agents import CoercionDetectorAgent, MuleGraphHunterAgent
@@ -50,6 +58,65 @@ def compute_wilson_ci(k: int, n: int, confidence: float = 0.95) -> Tuple[float, 
     lower = max(0.0, (center - margin) * 100.0)
     upper = min(100.0, (center + margin) * 100.0)
     return (round(lower, 1), round(upper, 1))
+
+
+# Vulnerable vocabulary used by the urgency-only baseline. Deliberately broader
+# than the engine's own patterns so the baseline is genuinely competitive -
+# a weak baseline is no longer evidence of anything.
+_URGENCY_BASELINE_WORDS = (
+    "immediately", "right now", "deadline", "cutoff", "expires", "within 5",
+    "within 2", "within 3", "last chance", "before the", "further", "urgent",
+    "fai", "abhi", "jaldi", "foran", "waqt",
+)
+
+
+def _urgency_hits(transcript: str) -> int:
+    low = transcript.lower()
+    return sum(1 for w in _URGENCY_BASELINE_WORDS if w in low)
+
+
+def compute_baselines(dataset: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Score naive single-feature baselines against the same dataset.
+
+    The point of this function: a fraud model that ties a one-line rule has
+    demonstrated nothing. These baselines make that question answerable with
+    data instead of assertions. All rules are deterministic and use ONLY
+    account metadata / raw transcript - none of them read a ground-truth label
+    at decision time, and none may use `type`.
+    """
+    rules = {
+        "age_lt_60_days": lambda c: c["receiver"]["account_age_days"] < 60,
+        "age_lt_14_days": lambda c: c["receiver"]["account_age_days"] < 14,
+        "kyc_tier_0": lambda c: "tier 0" in c["receiver"]["kyc_tier"].lower(),
+        "urgency_single_word": lambda c: _urgency_hits(c["transcript"]) >= 1,
+        "urgency_two_words": lambda c: _urgency_hits(c["transcript"]) >= 2,
+    }
+
+    out = {}
+    for name, rule in rules.items():
+        tp = fn = fp = tn = 0
+        for c in dataset:
+            predicted = rule(c)
+            is_fraud = c["type"] == "FRAUD"
+            if is_fraud and predicted:
+                tp += 1
+            elif is_fraud:
+                fn += 1
+            elif predicted:
+                fp += 1
+            else:
+                tn += 1
+        n_fraud, n_clean = tp + fn, fp + tn
+        recall = round(tp / n_fraud * 100, 1) if n_fraud else 0.0
+        fpr = round(fp / n_clean * 100, 1) if n_clean else 0.0
+        precision = round(tp / (tp + fp) * 100, 1) if (tp + fp) else 0.0
+        out[name] = {
+            "recall_percent": recall,
+            "fpr_percent": fpr,
+            "precision_percent": precision,
+            "tp": tp, "fn": fn, "fp": fp, "tn": tn,
+        }
+    return out
 
 
 def build_raw_graph(receiver_iban: str, amount: float, receiver_data: Dict[str, Any], graph_context: Dict[str, Any]) -> Dict[str, Any]:
@@ -293,7 +360,8 @@ async def evaluate_configuration(
 def generate_markdown_report(
     eval_results: Dict[str, Any],
     dataset_path: str,
-    dataset_sha256: str
+    dataset_sha256: str,
+    baselines: Optional[Dict[str, Any]] = None
 ) -> str:
     """Generates a formal evaluation report conforming strictly to Section 7."""
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -305,6 +373,52 @@ def generate_markdown_report(
     lines.append(f"**Dataset SHA-256:** `{dataset_sha256}`  ")
     lines.append(f"**Execution Protocol:** Zero-fabrication, single canonical pipeline (`backend/pipeline.py`), no label leakage.  ")
     lines.append("\n---\n")
+
+    lines.append("## 0. Ablation: Does the Model Beat a One-Line Rule?")
+    lines.append("")
+    lines.append(
+        "A fraud model that ties a trivial single-feature rule has demonstrated nothing. "
+        "The baselines below are scored against the identical dataset using account metadata "
+        "and raw transcript only - none reads a ground-truth label at decision time."
+    )
+    lines.append("")
+    if baselines:
+        lines.append("| Rule | Definition | n | Recall | FPR | Precision |")
+        lines.append("| :--- | :--- | :---: | :---: | :---: | :---: |")
+        desc = {
+            "age_lt_60_days": "`account_age_days < 60`",
+            "age_lt_14_days": "`account_age_days < 14`",
+            "kyc_tier_0": "`kyc_tier == \"Tier 0\"`",
+            "urgency_single_word": "any urgency word in transcript",
+            "urgency_two_words": ">= 2 urgency words in transcript",
+        }
+        for key, b in baselines.items():
+            n = b["tp"] + b["fn"] + b["fp"] + b["tn"]
+            lines.append(
+                f"| **{key}** | {desc.get(key, '')} | {n} | "
+                f"{b['recall_percent']}% | {b['fpr_percent']}% | {b['precision_percent']}% |"
+            )
+        lines.append("")
+        lines.append(
+            "> The v2 held-out set is engineered so account age and KYC tier carry **zero** "
+            "discriminative signal: every fraud beneficiary has an aged Tier 2/3 account. If the "
+            "metadata baselines above read 0.0% recall, the pipeline's score can only have come "
+            "from reading the transcript."
+        )
+    else:
+        lines.append("_Baselines not computed for this run._")
+    lines.append("")
+    lines.append("### Engine honesty note")
+    lines.append("")
+    lines.append(
+        "When no `GEMINI_API_KEY` is present, Configs B and C execute the deterministic "
+        "fallback and are labelled `ERROR_FALLBACK` in the run log. Those rows must **not** "
+        "be presented as Gemini measurements - export the key and re-run before quoting any "
+        "Gemini number."
+    )
+    lines.append("")
+    lines.append("---")
+    lines.append("")
 
     lines.append("## 1. Executive Summary & Slide 12 Ablation Matrix")
     lines.append("The table below reports real, measured metrics across the three evaluation configurations with Wilson 95% Confidence Intervals:\n")
@@ -398,8 +512,14 @@ async def main():
     parser = argparse.ArgumentParser(description="Shaheen Interceptor Evaluation & Ablation Runner")
     parser.add_argument("--dataset", type=str, default="eval/heldout.json", help="Path to evaluation JSON")
     parser.add_argument("--config", type=str, default="all", choices=["A", "B", "C", "all"], help="Evaluation configuration")
-    parser.add_argument("--output-dir", type=str, default="eval/results", help="Output directory for JSON runs")
-    parser.add_argument("--report-path", type=str, default="eval/REPORT.md", help="Path for markdown report")
+    parser.add_argument("--output-dir", type=str, default=None,
+                        help="Output directory for JSON runs (default: eval_results_uncommitted/, gitignored)")
+    parser.add_argument("--report-path", type=str, default=None,
+                        help="Path for markdown report (default: eval_results_uncommitted/REPORT.md)")
+    parser.add_argument("--commit", action="store_true",
+                        help="Write into eval/ (committed evidence). Use only for an official run.")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Do not write the markdown report")
     args = parser.parse_args()
 
     if not os.path.exists(args.dataset):
@@ -421,25 +541,31 @@ async def main():
     for cfg in configs_to_run:
         eval_results[cfg] = await evaluate_configuration(dataset, cfg)
 
-    # Ensure results directory exists
-    os.makedirs(args.output_dir, exist_ok=True)
+    # Resolve output paths. Default is a gitignored scratch dir so routine
+    # verification never touches the committed evidence record in eval/.
+    output_dir = args.output_dir or os.path.join(ROOT_DIR, SCRATCH_DIR)
+    report_path = args.report_path or os.path.join(output_dir, "REPORT.md")
+
+    os.makedirs(output_dir, exist_ok=True)
     timestamp_slug = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    out_json_path = os.path.join(args.output_dir, f"eval_run_{timestamp_slug}.json")
+    out_json_path = os.path.join(output_dir, f"eval_run_{timestamp_slug}.json")
 
     with open(out_json_path, "w", encoding="utf-8") as f:
         json.dump({
             "timestamp": timestamp_slug,
-            "dataset": args.dataset,
+            "dataset": os.path.basename(args.dataset),
             "dataset_sha256": dataset_sha256,
+            "baselines": compute_baselines(dataset),
             "results": eval_results
         }, f, indent=2)
     print(f"\n[+] Raw evaluation JSON saved to: {out_json_path}")
 
-    # Generate Markdown Report
-    report_md = generate_markdown_report(eval_results, args.dataset, dataset_sha256)
-    with open(args.report_path, "w", encoding="utf-8") as f:
-        f.write(report_md)
-    print(f"[+] Evaluation Report saved to: {args.report_path}")
+    if not args.dry_run:
+        report_md = generate_markdown_report(
+            eval_results, args.dataset, dataset_sha256, compute_baselines(dataset))
+        with open(report_path, "w", encoding="utf-8") as f:
+            f.write(report_md)
+        print(f"[+] Evaluation Report saved to: {report_path}")
 
 
 if __name__ == "__main__":

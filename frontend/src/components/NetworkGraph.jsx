@@ -17,8 +17,10 @@ export default function NetworkGraph({ topology, isClean }) {
 
   // Compute node coordinates map
   const nodeMap = {};
-  nodes.forEach((n) => {
-    nodeMap[n.id] = n;
+  nodes.forEach((n, idx) => {
+    const x = n.x !== undefined ? n.x : 120 + ((idx % 4) * 190);
+    const y = n.y !== undefined ? n.y : 140 + (Math.floor(idx / 4) * 140);
+    nodeMap[n.id] = { ...n, x, y };
   });
 
   return (

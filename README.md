@@ -84,9 +84,11 @@ Evaluated across the frozen held-out dataset (`eval/heldout.json`, SHA-256: `398
 
 | Config | Architecture | n | Recall (Wilson 95% CI) | FPR (Wilson 95% CI) | Precision | p50 / p95 Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Config A** | Rules Baseline (no LLM) | 40 | **100.0%** [83.9%, 100.0%] | **0.0%** [0.0%, 16.1%] | 100.0% | **0.9 ms / 2.7 ms** |
-| **Config B** | Gemini Coercion + Rule Graph | 40 | **100.0%** [83.9%, 100.0%] | **0.0%** [0.0%, 16.1%] | 100.0% | **0.8 ms / 12.6 ms** |
-| **Config C** | Full Pipeline (Gemini + Graph + Fusion) | 40 | **100.0%** [83.9%, 100.0%] | **0.0%** [0.0%, 16.1%] | 100.0% | **1.0 ms / 2.3 ms** |
+| **Config A** | Rules Baseline (no LLM) | 40 | **90.9%** [72.2%, 97.5%] | **5.6%** [1.0%, 25.8%] | 95.2% | **0.8 ms / 5.1 ms** |
+| **Config B** | Gemini Coercion + Rule Graph | 40 | *Pending live Gemini rerun* | — | — | — |
+| **Config C** | Full Pipeline (Gemini + Graph + Fusion) | 40 | *Pending live Gemini rerun* | — | — | — |
+
+*Dataset: 40 held-out cases (22 fraud / 18 benign), SHA-256 `9d650f03754dc84f02c637c4dfb3a4e698a497d175d6241a7328dc2ff545cb55`. Two missed fraud cases (`HO-SCAM-10`, `HO-SCAM-11`) and one false positive (`HO-CLEAN-06`) are documented in `docs/EVALUATION.md` §3.*
 
 *Full evaluation report, category breakdowns, and diagnostic traces are documented in [`eval/REPORT.md`](file:///s:/Projects/Ai%20builder%20cup%202026/eval/REPORT.md) and [`docs/EVALUATION.md`](file:///s:/Projects/Ai%20builder%20cup%202026/docs/EVALUATION.md).*
 *Synthetic demonstration data notice: all scenarios and identities are synthetic simulations.*

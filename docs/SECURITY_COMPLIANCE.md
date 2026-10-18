@@ -4,6 +4,24 @@
 **Document Classification:** RESTRICTED // BFSI AUDIT & REGULATORY FILING  
 **Version:** 1.0.0  
 
+> ## ⚠️ PROTOTYPE SCOPE NOTICE — READ FIRST
+>
+> This document describes the **engineering prototype** built for the AI Builder Cup 2026.
+> It is **not a compliance attestation** and carries **no certification, accreditation, or
+> regulatory sign-off**. Nothing in this file should be read as a claim of PCI-DSS, ISO 27001,
+> SOC 2, SBP registration, or FMU/PECA compliance.
+>
+> Every control in section 2 carries a status tag:
+>
+> | Tag | Meaning |
+> | :--- | :--- |
+> | `[IMPLEMENTED]` | Present and exercised in this prototype |
+> | `[PARTIAL]` | Present but with documented gaps (see section 6) |
+> | `[SIMULATED]` | Demonstrated against synthetic data only |
+> | `[TARGET]` | Designed for, **not present** in this prototype |
+>
+> Section 6 lists every control that is a target rather than a delivered capability.  
+
 ---
 
 ## 1. Regulatory Context & Mandates

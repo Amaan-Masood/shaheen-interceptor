@@ -1,7 +1,7 @@
 """
 Shaheen Interceptor - BFSI Fraud, Vishing & Money Mule Defense Platform
 Multi-Agent Forensic Intelligence Engine:
-- Agent 1: Coercion & Vishing Detector (gemini-2.5-flash + Deterministic NLP Baseline)
+- Agent 1: Coercion & Vishing Detector (gemini-flash-latest + Deterministic NLP Baseline)
 - Agent 2: Mule Graph Hunter (Feature-based Topology & Telemetry Engine)
 - Agent 3: Active AI Decoy Honeypot & Regulatory SAR Draft Generator
 
@@ -220,7 +220,7 @@ You MUST respond strictly with valid JSON conforming to the schema."""
     def __init__(self, force_fallback: bool = False):
         self.force_fallback = force_fallback
         self.client = None if force_fallback else get_genai_client()
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
 
     def analyze(self, transcript: str, amount: float, sender_info: Dict[str, Any], receiver_info: Dict[str, Any]) -> CoercionAnalysisResult:
         """Runs Gemini 2.5 Flash if available, otherwise executes deterministic forensic NLP rules."""
@@ -694,7 +694,7 @@ Key Persona Behaviors:
 
     def __init__(self):
         self.client = get_genai_client()
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
 
     def run_decoy_turn(self, scammer_message: str, history: Optional[List[Dict[str, str]]] = None) -> DecoyTurnResult:
         """Engages the scammer in dialogue, baits for backup accounts, and captures extracted IOCs."""

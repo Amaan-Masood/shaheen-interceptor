@@ -1,0 +1,35 @@
+# =============================================================================
+# SHAHEEN INTERCEPTOR - Line-ending policy
+# =============================================================================
+# Git for Windows ships with `core.autocrlf=true`, which stores LF in the index
+# but writes CRLF to the working tree. That made the published dataset digest
+# unsatisfiable: the committed blob hashed to one value and the on-disk file
+# (CRLF-expanded) to another, so the verification command printed in
+# docs/EVALUATION.md failed for anyone who actually ran it.
+#
+# Fix: pin all files to LF in both the index and the working tree. Evaluation
+# artefacts are integrity-checked, so they must hash identically everywhere.
+# =============================================================================
+
+* text=auto eol=lf
+
+# Dataset, evaluation runs and generated reports: byte-stable digests required.
+eval/**          text eol=lf
+docs/**          text eol=lf
+scripts/**       text eol=lf
+backend/**       text eol=lf
+frontend/src/**  text eol=lf
+
+# Shell scripts must stay LF, or the deploy pipeline breaks on Linux/Cloud Run.
+*.sh             text eol=lf
+
+# Binary assets must never be line-ending converted.
+*.png            binary
+*.jpg            binary
+*.jpeg           binary
+*.gif            binary
+*.svg            text
+*.wav            binary
+*.ico            binary
+*.woff           binary
+*.woff2          binary

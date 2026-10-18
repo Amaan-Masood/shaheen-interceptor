@@ -1,21 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --bg-obsidian: #05070B;
-  --panel-bg: #090D14;
-  --border-tactical: #1E293B;
-  --accent-crimson: #EF4444;
-  --accent-amber: #F59E0B;
-  --accent-emerald: #10B981;
-  --accent-cyan: #38BDF8;
+/* Shaheen Interceptor — Design tokens.
+   Palette: Graphite SOC. Single danger accent (crimson). Everything else
+   neutral slate with restrained semantic status colors. No neon glows,
+   no scanlines, no CRT theatrics — real SOC tools (Cortex, Falcon,
+   Defender) read quiet and data-first. Every color here is used to
+   communicate severity or state; nothing decorative. */
+
+@theme {
+  --color-ink: #0F172A;           /* base background */
+  --color-ink-raised: #111827;    /* panel surface */
+  --color-ink-raised-2: #171F2E;  /* nested surface */
+  --color-border: #1E293B;        /* structural dividers */
+  --color-border-strong: #334155; /* interactive borders */
+  --color-fg: #E2E8F0;            /* primary text */
+  --color-fg-muted: #94A3B8;      /* secondary text */
+  --color-fg-subtle: #64748B;     /* tertiary / captions */
+  --color-danger: #DC2626;        /* quarantine / critical */
+  --color-danger-strong: #EF4444; /* emphasized critical */
+  --color-warn: #D97706;          /* fallback / degraded */
+  --color-ok: #059669;            /* cleared / verified */
+  --color-info: #2563EB;          /* metadata / links */
+  --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", monospace;
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", "Inter", sans-serif;
 }
 
-body {
+:root {
+  color-scheme: dark;
+}
+
+html, body {
   margin: 0;
   padding: 0;
-  background-color: #05070B;
+  background-color: #0F172A;
   color: #E2E8F0;
-  font-family: 'JetBrains Mono', monospace, ui-monospace;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
@@ -24,113 +46,62 @@ body {
   min-height: 100vh;
 }
 
-/* Custom Scrollbars */
+/* Numbers always tabular so scores and latencies don't shift as they update */
+.tabular,
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slim scrollbars — cockpit UI uses narrow gutters */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070B;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #1E293B;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
 
-/* Tactical Corner Crosshairs (+) on containers */
-.tactical-box {
-  position: relative;
-}
-.tactical-box::before,
-.tactical-box::after {
-  content: "+";
-  position: absolute;
-  font-family: monospace;
-  font-size: 11px;
-  color: rgba(239, 68, 68, 0.4);
-  line-height: 1;
-  pointer-events: none;
-}
-.tactical-box::before {
-  top: 2px;
-  left: 3px;
-}
-.tactical-box::after {
-  bottom: 2px;
-  right: 3px;
-}
-
-/* Subtle CRT Scanline overlay */
-.crt-overlay {
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
-  ), linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.02),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.02)
-  );
-  background-size: 100% 3px, 6px 100%;
-  pointer-events: none;
-}
-
-/* Diagonal Hazard Stripes for Critical Warnings */
-.hazard-stripes {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(239, 68, 68, 0.15),
-    rgba(239, 68, 68, 0.15) 8px,
-    transparent 8px,
-    transparent 16px
-  );
-}
-
-/* Threat Pulses */
-@keyframes pulseCrimsonGlow {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25), inset 0 0 10px rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.7), inset 0 0 20px rgba(239, 68, 68, 0.4);
-    border-color: rgba(239, 68, 68, 1);
-  }
-}
-.pulse-crimson {
-  animation: pulseCrimsonGlow 2s infinite ease-in-out;
-}
-
-/* Flow Dash Animation for SVG Links */
+/* Edge of flow direction for SVG transfer links — a moving dash pattern
+   that reads as directional motion without pulsing. Used only on the
+   mule graph edges. */
 @keyframes flowDash {
   to {
     stroke-dashoffset: -24;
   }
 }
 .flow-animated {
-  stroke-dasharray: 6 3;
-  animation: flowDash 0.8s linear infinite;
+  stroke-dasharray: 6 4;
+  animation: flowDash 1.4s linear infinite;
 }
 
-/* Radar Sweep Ring */
-@keyframes radarSweep {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Subtle live-status dot. Replaces the old `animate-ping` + `animate-pulse`
+   double-dot pattern that was reading as "everything is on fire". A single
+   filled dot with a slow 3s opacity breathe. */
+@keyframes liveBreathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
-.radar-sweep {
-  transform-origin: center;
-  animation: radarSweep 8s linear infinite;
+.live-dot {
+  animation: liveBreathe 3s ease-in-out infinite;
 }
 
-/* Text glow */
-.text-glow-red {
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
-}
-.text-glow-cyan {
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
-}
-.text-glow-green {
-  text-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+/* Respect users who prefer reduced motion — every animation in this
+   stylesheet has a static fallback. */
+@media (prefers-reduced-motion: reduce) {
+  .flow-animated,
+  .live-dot {
+    animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

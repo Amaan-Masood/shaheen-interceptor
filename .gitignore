@@ -33,6 +33,10 @@ serviceAccountKey*.json
 .coverage
 htmlcov/
 
+# Evaluation scratch output. Committed evidence lives in eval/results/.
+# Routine verification runs write here so they never touch the evidence record.
+eval_results_uncommitted/
+
 # Build outputs
 dist/
 dist-ssr/

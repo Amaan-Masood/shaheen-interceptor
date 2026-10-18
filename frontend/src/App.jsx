@@ -50,16 +50,26 @@ export default function App() {
 
   // Modals
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false);
+  // Fallback benchmark mirrors the frozen 40-case held-out dataset from
+  // eval/RESULTS.md. These are the deterministic-baseline numbers — not
+  // fabricated. If the backend is unreachable this is what the UI shows,
+  // and it matches the numbers in docs/EVALUATION.md exactly.
   const [benchmarkData, setBenchmarkData] = useState({
     metrics: {
-      detection_recall_percent: 100.0,
-      false_positive_rate_percent: 0.0,
-      precision_percent: 100.0,
-      accuracy_percent: 100.0,
-      avg_latency_ms: 1.1,
-      p50_latency_ms: 0.9,
-      p95_latency_ms: 2.7,
-      total_benchmark_time_ms: 67.0
+      detection_recall_percent: 90.9,
+      false_positive_rate_percent: 5.6,
+      precision_percent: 95.2,
+      accuracy_percent: 92.5,
+      avg_latency_ms: 0.9,
+      p50_latency_ms: 0.8,
+      p95_latency_ms: 5.1,
+      total_benchmark_time_ms: 55.0,
+      dataset_sha256: "9d650f03754dc84f02c637c4dfb3a4e698a497d175d6241a7328dc2ff545cb55",
+      total_cases: 40,
+      fraud_cases: 22,
+      clean_cases: 18,
+      missed_fraud_count: 2,
+      false_positive_count: 1
     },
     results: FALLBACK_BENCHMARK_CASES
   });
@@ -86,14 +96,38 @@ export default function App() {
 
     // 2. Fetch scenarios
     fetch(`${API_BASE}/api/scenarios`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Scenarios API error");
+        return res.json();
+      })
       .then((data) => {
         if (data.scenarios && Array.isArray(data.scenarios)) {
           const map = {};
           data.scenarios.forEach((s) => {
-            map[s.id] = s;
+            const fallback = FALLBACK_SCENARIOS[s.id] || {};
+            let transcriptList = [];
+            if (Array.isArray(fallback.transcript) && fallback.transcript.length > 0) {
+              transcriptList = fallback.transcript;
+            } else if (Array.isArray(s.transcript_snippets) && s.transcript_snippets.length > 0) {
+              transcriptList = s.transcript_snippets;
+            } else if (Array.isArray(s.transcript)) {
+              transcriptList = s.transcript;
+            } else if (typeof s.transcript === "string" && s.transcript.trim()) {
+              transcriptList = [
+                { speaker: "PERPETRATOR", text: s.transcript, tag: "COERCION_STREAM" }
+              ];
+            }
+
+            map[s.id] = {
+              ...fallback,
+              ...s,
+              title: s.title || fallback.title || s.name || s.id,
+              subtitle: s.subtitle || fallback.subtitle || "",
+              transcript: transcriptList,
+              raw_transcript: typeof s.transcript === "string" ? s.transcript : fallback.raw_transcript,
+              graph: fallback.graph || s.mule_graph || { nodes: [], edges: [] }
+            };
           });
-          // Merge with fallback to preserve coordinates
           setScenarios((prev) => ({ ...prev, ...map }));
         }
       })
@@ -113,20 +147,37 @@ export default function App() {
   // Intercept & Analyze Transaction
   const handleIntercept = async (scId = selectedScenarioId) => {
     setIsAnalyzing(true);
-    const targetScenario = scenarios[scId] || scenarios.SCENARIO_1_VISHING;
+    const targetScenario = scenarios[scId] || scenarios.SCENARIO_1_VISHING || FALLBACK_SCENARIOS.SCENARIO_1_VISHING;
 
     try {
+      const transcriptStr = targetScenario.raw_transcript ||
+        (typeof targetScenario.transcript === "string"
+          ? targetScenario.transcript
+          : Array.isArray(targetScenario.transcript)
+          ? targetScenario.transcript.map((t) => `${t.speaker}: ${t.text}`).join("\n")
+          : "");
+
       const res = await fetch(`${API_BASE}/api/analyze-transaction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenario_id: scId })
+        body: JSON.stringify({
+          scenario_id: scId,
+          transcript: transcriptStr,
+          amount: targetScenario.amount,
+          currency: targetScenario.currency || "PKR",
+          channel: targetScenario.channel || "Raast Instant Transfer",
+          sender: targetScenario.sender,
+          receiver: targetScenario.receiver,
+          graph_data: targetScenario.graph || targetScenario.mule_graph
+        })
       });
 
       if (res.ok) {
         const data = await res.json();
-        // Merge graph topology coordinates from fallback data if missing
         const fallbackGraph = FALLBACK_SCENARIOS[scId]?.graph || targetScenario.graph;
-        data.graph_topology = fallbackGraph;
+        if (!data.graph_topology || !data.graph_topology.nodes || data.graph_topology.nodes.length === 0) {
+          data.graph_topology = fallbackGraph;
+        }
         setCurrentAlert(data);
       } else {
         throw new Error("Backend response not ok");
@@ -254,18 +305,25 @@ export default function App() {
         throw new Error("Benchmark API error");
       }
     } catch (err) {
-      // Fallback benchmark data from frozen held-out baseline (zero fabrication)
+      // Offline fallback: same frozen held-out baseline as the initial state.
+      // Real numbers from eval/RESULTS.md, not fabricated.
       setIsOffline(true);
       setBenchmarkData({
         metrics: {
-          detection_recall_percent: 100.0,
-          false_positive_rate_percent: 0.0,
-          precision_percent: 100.0,
-          accuracy_percent: 100.0,
-          avg_latency_ms: 1.1,
-          p50_latency_ms: 0.9,
-          p95_latency_ms: 2.7,
-          total_benchmark_time_ms: 67.0
+          detection_recall_percent: 90.9,
+          false_positive_rate_percent: 5.6,
+          precision_percent: 95.2,
+          accuracy_percent: 92.5,
+          avg_latency_ms: 0.9,
+          p50_latency_ms: 0.8,
+          p95_latency_ms: 5.1,
+          total_benchmark_time_ms: 55.0,
+          dataset_sha256: "9d650f03754dc84f02c637c4dfb3a4e698a497d175d6241a7328dc2ff545cb55",
+          total_cases: 40,
+          fraud_cases: 22,
+          clean_cases: 18,
+          missed_fraud_count: 2,
+          false_positive_count: 1
         },
         results: FALLBACK_BENCHMARK_CASES
       });
@@ -275,7 +333,7 @@ export default function App() {
     }
   };
 
-  const activeScenario = scenarios[selectedScenarioId] || scenarios.SCENARIO_1_VISHING;
+  const activeScenario = scenarios[selectedScenarioId] || scenarios.SCENARIO_1_VISHING || FALLBACK_SCENARIOS.SCENARIO_1_VISHING || {};
   const isClean = activeScenario.category === "CLEAN_URGENT";
 
   return (

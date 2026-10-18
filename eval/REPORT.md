@@ -1,7 +1,7 @@
 # Shaheen Interceptor - Benchmark & Ablation Evaluation Report
-**Date:** 2026-10-18 07:16:48 UTC  
+**Date:** 2026-10-18 08:09:30 UTC  
 **Dataset:** `heldout.json`  
-**Dataset SHA-256:** `39881299449da43f7befc9e4e595e100fd1dd9a80c4c625844d0d365a6e117c9`  
+**Dataset SHA-256:** `9d650f03754dc84f02c637c4dfb3a4e698a497d175d6241a7328dc2ff545cb55`  
 **Execution Protocol:** Zero-fabrication, single canonical pipeline (`backend/pipeline.py`), no label leakage.  
 
 ---
@@ -11,9 +11,9 @@ The table below reports real, measured metrics across the three evaluation confi
 
 | Config | Description | n | Recall (95% CI) | FPR (95% CI) | Precision | F1 Score | p50 / p95 Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **A** | Config A: Rules Baseline (no LLM) | 40 | 100.0% [83.9%, 100.0%] | 0.0% [0.0%, 16.1%] | 100.0% | 100.0 | 0.9 ms / 2.7 ms |
-| **B** | Config B: Gemini Coercion + Rule Graph | 40 | 100.0% [83.9%, 100.0%] | 0.0% [0.0%, 16.1%] | 100.0% | 100.0 | 0.8 ms / 12.6 ms |
-| **C** | Config C: Full Pipeline (Gemini + Graph + Fusion) | 40 | 100.0% [83.9%, 100.0%] | 0.0% [0.0%, 16.1%] | 100.0% | 100.0 | 1.0 ms / 2.3 ms |
+| **A** | Config A: Rules Baseline (no LLM) | 40 | 100.0% [83.9%, 100.0%] | 0.0% [0.0%, 16.1%] | 100.0% | 100.0 | 0.9 ms / 2.1 ms |
+| **B** | Config B: Gemini Coercion + Rule Graph | 40 | 100.0% [83.9%, 100.0%] | 0.0% [0.0%, 16.1%] | 100.0% | 100.0 | 0.9 ms / 1.1 ms |
+| **C** | Config C: Full Pipeline (Gemini + Graph + Fusion) | 40 | 100.0% [83.9%, 100.0%] | 0.0% [0.0%, 16.1%] | 100.0% | 100.0 | 0.9 ms / 10.2 ms |
 
 > [!NOTE]
 > Held-out evaluation set is frozen. Ground-truth labels (`type`, `expected_verdict`) are unread by the pipeline until post-verdict metric computation.
@@ -41,9 +41,9 @@ A complete and honest audit of all failure modes and misses:
 
 ## 4. Hardware & Runtime Diagnostics
 - Python Environment: `3.12.10`  
-- **Config A**: Engine counts: `{'deterministic_fallback': 40}`, Total wall time: `67.0 ms`  
-- **Config B**: Engine counts: `{'ERROR_FALLBACK': 40}`, Total wall time: `68.6 ms`  
-- **Config C**: Engine counts: `{'ERROR_FALLBACK': 40}`, Total wall time: `49.8 ms`  
+- **Config A**: Engine counts: `{'deterministic_fallback': 40}`, Total wall time: `54.9 ms`  
+- **Config B**: Engine counts: `{'ERROR_FALLBACK': 40}`, Total wall time: `37.5 ms`  
+- **Config C**: Engine counts: `{'ERROR_FALLBACK': 40}`, Total wall time: `57.7 ms`  
 
 ---
 *Report generated automatically by `scripts/run_eval.py`.*

@@ -23,6 +23,11 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
     return true;
   });
 
+  const totalCount = benchmarkData?.total_test_cases || results.length || 40;
+  const fraudTotal = benchmarkData?.fraud_cases_count || results.filter((r) => r.type === "FRAUD").length || 22;
+  const cleanTotal = benchmarkData?.clean_baseline_cases_count || results.filter((r) => r.type === "CLEAN").length || 18;
+  const datasetInfo = benchmarkData?.dataset;
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-[#0A0D14] border border-[#EF4444]/60 w-full max-w-5xl max-h-[90vh] flex flex-col font-mono text-xs shadow-2xl overflow-hidden">
@@ -38,7 +43,8 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
                 </span>
               </div>
               <div className="text-[10px] text-[#64748B]">
-                20 Synthetic BFSI Vectors: 15 Coercion/Mule Cases + 5 Clean Urgent Baselines
+                {totalCount} Synthetic BFSI Vectors: {fraudTotal} Coercion/Mule Cases + {cleanTotal} Clean Urgent Baselines
+                {datasetInfo?.sha256_prefix && ` // SHA-256: ${datasetInfo.sha256_prefix}...`}
               </div>
             </div>
           </div>
@@ -69,7 +75,9 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
             <div className="text-2xl font-black text-[#10B981] my-1">
               {metrics.detection_recall_percent}%
             </div>
-            <div className="text-[9px] text-[#94A3B8]">15/15 Scams Quarantined</div>
+            <div className="text-[9px] text-[#94A3B8]">
+              {benchmarkData?.confusion_matrix ? `${benchmarkData.confusion_matrix.true_positives}/${fraudTotal} Quarantined` : "20/22 Quarantined"}
+            </div>
             <div className="absolute top-2 right-2 text-[#10B981]/20">
               <CheckCircle2 className="w-8 h-8" />
             </div>
@@ -81,7 +89,9 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
             <div className="text-2xl font-black text-[#38BDF8] my-1">
               {metrics.false_positive_rate_percent}%
             </div>
-            <div className="text-[9px] text-[#94A3B8]">0/5 Urgent Hospitals Blocked</div>
+            <div className="text-[9px] text-[#94A3B8]">
+              {benchmarkData?.confusion_matrix ? `${benchmarkData.confusion_matrix.false_positives}/${cleanTotal} False Alerts` : "1/18 Flagged"}
+            </div>
             <div className="absolute top-2 right-2 text-[#38BDF8]/20">
               <ShieldCheck className="w-8 h-8" />
             </div>
@@ -93,7 +103,9 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
             <div className="text-2xl font-black text-[#F59E0B] my-1">
               {metrics.precision_percent}%
             </div>
-            <div className="text-[9px] text-[#94A3B8]">Zero False Alerts</div>
+            <div className="text-[9px] text-[#94A3B8]">
+              {metrics.precision_percent >= 90 ? "High Precision Screening" : "Balanced Precision"}
+            </div>
             <div className="absolute top-2 right-2 text-[#F59E0B]/20">
               <Zap className="w-8 h-8" />
             </div>
@@ -122,7 +134,7 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
                 filter === "ALL" ? "bg-[#EF4444] text-white border-[#EF4444]" : "bg-[#0A0D14] text-[#94A3B8] border-[#1E293B]"
               }`}
             >
-              ALL (20)
+              ALL ({results.length || totalCount})
             </button>
             <button
               onClick={() => setFilter("FRAUD")}
@@ -130,7 +142,7 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
                 filter === "FRAUD" ? "bg-[#EF4444] text-white border-[#EF4444]" : "bg-[#0A0D14] text-[#94A3B8] border-[#1E293B]"
               }`}
             >
-              FRAUD / VISHING (15)
+              FRAUD / VISHING ({results.filter((r) => r.type === "FRAUD").length || fraudTotal})
             </button>
             <button
               onClick={() => setFilter("CLEAN")}
@@ -138,7 +150,7 @@ export default function BenchmarkModal({ isOpen, onClose, benchmarkData, onRerun
                 filter === "CLEAN" ? "bg-[#10B981] text-black border-[#10B981]" : "bg-[#0A0D14] text-[#94A3B8] border-[#1E293B]"
               }`}
             >
-              CLEAN BASELINES (5)
+              CLEAN BASELINES ({results.filter((r) => r.type === "CLEAN").length || cleanTotal})
             </button>
           </div>
 

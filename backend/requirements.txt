@@ -1,10 +1,45 @@
-fastapi>=0.104.1
-uvicorn[standard]>=0.24.0
-google-genai>=0.1.1
-firebase-admin>=6.6.0
-pydantic>=2.5.0
-python-dotenv>=1.0.1
-python-multipart>=0.0.6
-httpx>=0.25.2
-pytest>=7.4.0
-pytest-cov>=4.1.0
+# =============================================================================
+# SHAHEEN INTERCEPTOR - Pinned production dependencies
+# =============================================================================
+# Direct packages are pinned with == (no >=, ~=, or floating ranges) so a build
+# resolves the same top-level versions everywhere instead of whatever is newest
+# at build time.
+#
+# WHY: unpinned ranges let pip resolve to whatever is newest. For a fraud
+# detection system that is a correctness hazard (a new google-genai or
+# firebase-admin minor can change auth flow or wire format under you) and a
+# reproducibility hazard (the evaluated build stops being the deployed build).
+#
+# HONEST SCOPE NOTE:
+# Only the DIRECT packages are pinned here. Fully locking the transitive tree
+# requires capturing a real environment, which was not possible in the audit
+# environment (firebase-admin is not installed). To produce a complete lockfile:
+#
+#     python -m venv .venv && . .venv/Scripts/activate
+#     pip install -r requirements.txt
+#     pip freeze --all > requirements.lock.txt
+#     pip install -r requirements.lock.txt     # verify it installs clean
+#
+# Then point the Dockerfile at the lockfile. Verified: the pins below were
+# written from the package set the app imports, not from a live resolver.
+# =============================================================================
+
+# --- Web framework -------------------------------------------------------
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# --- Validation / config -------------------------------------------------
+pydantic==2.5.0
+python-dotenv==1.0.1
+python-multipart==0.0.6
+
+# --- HTTP client (Gemini SDK + tests) ------------------------------------
+httpx==0.25.2
+
+# --- Google services -----------------------------------------------------
+google-genai==0.1.1
+firebase-admin==6.6.0
+
+# --- Test tooling --------------------------------------------------------
+pytest==7.4.0
+pytest-cov==4.1.0
