@@ -20,8 +20,16 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy backend application source code
 COPY . .
 
+# Run as non-root user for container security (P2-5)
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Expose Cloud Run default ingress port 8080
 EXPOSE 8080
+
+# Container Healthcheck against FastAPI endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/api/health || exit 1
 
 # Production command for Cloud Run container execution
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

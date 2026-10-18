@@ -20,11 +20,18 @@ backend/venv/
 
 # Environment variables & secrets
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+*.env*
 backend/.env
+serviceAccountKey*.json
+*.pem
+*.key
+*.p12
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Build outputs
 dist/

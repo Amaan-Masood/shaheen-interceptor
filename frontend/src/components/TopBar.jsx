@@ -97,20 +97,26 @@ export default function TopBar({ systemStatus, onOpenBenchmark, activeScenarioTi
         <div className="flex items-center gap-1.5 bg-[#090D14] border border-[#1E293B] px-2.5 py-1 text-[10.5px] font-mono">
           <Database className="w-3.5 h-3.5 text-[#10B981]" />
           <span className="text-[#64748B]">FIRESTORE:</span>
-          <span className="text-[#10B981] font-bold flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
-            LIVE SYNC
+          <span className={`font-bold flex items-center gap-1 ${systemStatus?.firestore_connected ? "text-[#10B981]" : "text-[#F59E0B]"}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${systemStatus?.firestore_connected ? "bg-[#10B981]" : "bg-[#F59E0B]"} animate-pulse`}></span>
+            {systemStatus?.firestore_connected ? "LIVE SYNC" : "MIRROR"}
           </span>
         </div>
 
-        {/* Gemini 2.5 Flash */}
+        {/* Gemini Engine */}
         <div className="flex items-center gap-1.5 bg-[#090D14] border border-[#1E293B] px-2.5 py-1 text-[10.5px] font-mono">
           <Sparkles className="w-3.5 h-3.5 text-[#A855F7]" />
-          <span className="text-[#64748B]">GEMINI 2.5:</span>
-          <span className="text-[#10B981] font-bold flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
-            READY
+          <span className="text-[#64748B]">GEMINI:</span>
+          <span className={`font-bold flex items-center gap-1 ${systemStatus?.gemini_live ? "text-[#10B981]" : "text-[#38BDF8]"}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${systemStatus?.gemini_live ? "bg-[#10B981]" : "bg-[#38BDF8]"} animate-pulse`}></span>
+            {systemStatus?.gemini_live ? "2.5 FLASH" : "FALLBACK"}
           </span>
+        </div>
+
+        {/* Synthetic Benchmark Notice */}
+        <div className="hidden lg:flex items-center gap-1.5 bg-[#090D14] border border-[#334155] px-2 py-1 text-[10px] font-mono text-[#94A3B8]">
+          <Shield className="w-3 h-3 text-[#38BDF8]" />
+          <span>SYNTHETIC BENCHMARK</span>
         </div>
 
         {/* Benchmark Trigger Button */}

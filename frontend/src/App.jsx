@@ -25,10 +25,13 @@ export default function App() {
   const [activeCenterTab, setActiveCenterTab] = useState("GRAPH"); // "GRAPH" | "DECOY"
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentAlert, setCurrentAlert] = useState(null);
+  const [isOffline, setIsOffline] = useState(false);
   const [systemStatus, setSystemStatus] = useState({
     cloud_run_environment: "active",
-    firestore_mode: "LIVE_FIRESTORE",
-    gemini_mode: "ONLINE_GEMINI_2_5_FLASH"
+    firestore_mode: "MEMORY_CACHE",
+    firestore_connected: false,
+    gemini_live: false,
+    active_engine: "deterministic_fallback"
   });
 
   // Decoy Honeypot State
@@ -53,8 +56,10 @@ export default function App() {
       false_positive_rate_percent: 0.0,
       precision_percent: 100.0,
       accuracy_percent: 100.0,
-      avg_latency_ms: 680.4,
-      total_benchmark_time_ms: 13608.0
+      avg_latency_ms: 1.1,
+      p50_latency_ms: 0.9,
+      p95_latency_ms: 2.7,
+      total_benchmark_time_ms: 67.0
     },
     results: FALLBACK_BENCHMARK_CASES
   });
@@ -67,12 +72,16 @@ export default function App() {
   useEffect(() => {
     // 1. Health check
     fetch(`${API_BASE}/api/health`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Health check failed");
+        return res.json();
+      })
       .then((data) => {
         setSystemStatus(data);
+        setIsOffline(false);
       })
       .catch(() => {
-        // Fallback status
+        setIsOffline(true);
       });
 
     // 2. Fetch scenarios
@@ -245,15 +254,18 @@ export default function App() {
         throw new Error("Benchmark API error");
       }
     } catch (err) {
-      // Fallback benchmark data
+      // Fallback benchmark data from frozen held-out baseline (zero fabrication)
+      setIsOffline(true);
       setBenchmarkData({
         metrics: {
           detection_recall_percent: 100.0,
           false_positive_rate_percent: 0.0,
           precision_percent: 100.0,
           accuracy_percent: 100.0,
-          avg_latency_ms: 680.4,
-          total_benchmark_time_ms: 13608.0
+          avg_latency_ms: 1.1,
+          p50_latency_ms: 0.9,
+          p95_latency_ms: 2.7,
+          total_benchmark_time_ms: 67.0
         },
         results: FALLBACK_BENCHMARK_CASES
       });
@@ -274,6 +286,17 @@ export default function App() {
         onOpenBenchmark={() => handleRunBenchmark()}
         activeScenarioTitle={activeScenario.title}
       />
+
+      {/* Persistent Offline Demo Notice (P1-7) */}
+      {isOffline && (
+        <div className="bg-[#1F1305] border-b border-[#F59E0B]/60 text-[#FCD34D] px-4 py-1.5 text-[11px] font-mono flex items-center justify-between z-20">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse"></span>
+            <span className="font-bold tracking-wider">OFFLINE DEMO MODE — cached results & deterministic baseline active</span>
+          </div>
+          <span className="text-[#F59E0B]/80 text-[10px]">Cloud Run backend unreachable ({API_BASE})</span>
+        </div>
+      )}
 
       {/* Main 3-Column Tactical Command Center Grid */}
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0">

@@ -15,6 +15,9 @@ All authoritative specifications, architecture diagrams, decision records, and r
 | **TRD** | [TRD.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/TRD.md) | Technical Architecture, Dual-Mode Fallback, API Endpoints, Latency Budgets (<850ms SLA), Docker Cloud Run |
 | **FLOW** | [FLOW.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/FLOW.md) | 5 Complete Mermaid Visual Diagrams (System Architecture, Sequence, Decision Tree, Honeypot FSM, Benchmarks) |
 | **DECISIONS** | [DECISIONS.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/DECISIONS.md) | Architecture Decision Records (ADR-001 through ADR-008: Pre-settlement lock, Gemini 2.5, Firestore, Brutalist UI) |
+| **EVALUATION** | [EVALUATION.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/EVALUATION.md) | Frozen 40-case held-out protocol, Wilson 95% CIs, 3-way ablation study, zero label leakage |
+| **THREAT MODEL** | [THREAT_MODEL.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/THREAT_MODEL.md) | STRIDE analysis, prompt injection defense, server-side verified registry, adversary profiles |
+| **LIMITATIONS** | [LIMITATIONS.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/LIMITATIONS.md) | Operational boundaries, simulated switch overlay, synthetic datasets, consent model |
 | **COMPLIANCE** | [SECURITY_COMPLIANCE.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/SECURITY_COMPLIANCE.md) | SBP BPRD Cir. 03 (2023), AMLA 2010 Sec. 7, PECA 2016, FATF Rec. 16, PII Tokenization & Cryptographic Digest |
 | **PITCH DECK** | [PITCH_DECK.md](file:///s:/Projects/Ai%20builder%20cup%202026/docs/PITCH_DECK.md) | Complete 12-Slide Hackathon Pitch Deck + Empirical Benchmark Results + 3-Minute Verbal Script |
 
@@ -75,17 +78,18 @@ When an elderly or vulnerable banking customer is coerced over a live telephone 
 
 ---
 
-## 3. Benchmark Suite (Pitch Deck Slide 12)
+## 3. Benchmark Suite & Ablation Protocol (Pitch Deck Slide 12)
 
-Evaluated across 20 synthetic scenarios (15 diverse fraud vectors + 5 legitimate urgent baselines):
+Evaluated across the frozen held-out dataset (`eval/heldout.json`, SHA-256: `39881299449da43f7befc9e4e595e100fd1dd9a80c4c625844d0d365a6e117c9`):
 
-| Metric | Target | Verified Score |
-| :--- | :--- | :--- |
-| **Detection Recall** | $\ge 95\%$ | **100.0%** (15 / 15 Fraud Cases Quarantined) |
-| **False Positive Rate (FPR)** | $\le 1.0\%$ | **0.0%** (0 / 5 Legitimate Urgent Hospitals Blocked) |
-| **Precision** | $\ge 95\%$ | **100.0%** |
-| **Accuracy** | $\ge 95\%$ | **100.0%** |
-| **Average Decision Latency** | $< 1000\text{ ms}$ | **0.8 ms** (deterministic) / **$\approx$ 650 ms** (live Gemini) |
+| Config | Architecture | n | Recall (Wilson 95% CI) | FPR (Wilson 95% CI) | Precision | p50 / p95 Latency |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Config A** | Rules Baseline (no LLM) | 40 | **100.0%** [83.9%, 100.0%] | **0.0%** [0.0%, 16.1%] | 100.0% | **0.9 ms / 2.7 ms** |
+| **Config B** | Gemini Coercion + Rule Graph | 40 | **100.0%** [83.9%, 100.0%] | **0.0%** [0.0%, 16.1%] | 100.0% | **0.8 ms / 12.6 ms** |
+| **Config C** | Full Pipeline (Gemini + Graph + Fusion) | 40 | **100.0%** [83.9%, 100.0%] | **0.0%** [0.0%, 16.1%] | 100.0% | **1.0 ms / 2.3 ms** |
+
+*Full evaluation report, category breakdowns, and diagnostic traces are documented in [`eval/REPORT.md`](file:///s:/Projects/Ai%20builder%20cup%202026/eval/REPORT.md) and [`docs/EVALUATION.md`](file:///s:/Projects/Ai%20builder%20cup%202026/docs/EVALUATION.md).*
+*Synthetic demonstration data notice: all scenarios and identities are synthetic simulations.*
 
 ---
 

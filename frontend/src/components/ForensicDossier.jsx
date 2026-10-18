@@ -49,9 +49,14 @@ export default function ForensicDossier({ alert, onDeployDecoy, onGenerateSar, i
         <div className={`p-4 border ${statusBorder}/60 bg-[#090D14] relative overflow-hidden shadow-xl`}>
           <div className="flex items-center justify-between text-[10px] text-[#64748B] mb-1">
             <span className="uppercase font-bold tracking-wider">AI RISK RADIAL TACHOMETER</span>
-            <div className="flex items-center gap-1.5 text-[#38BDF8] font-bold text-xs">
-              <Clock className="w-3.5 h-3.5" />
-              <span>{alert.latency_ms || 740} ms</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] px-1.5 py-0.2 bg-[#1E293B] text-[#94A3B8] font-mono">
+                {alert.engine === "gemini" ? "GEMINI 2.5" : "FALLBACK"}
+              </span>
+              <div className="flex items-center gap-1 text-[#38BDF8] font-bold text-xs">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{alert.latency_ms !== undefined ? `${alert.latency_ms} ms` : "N/A"}</span>
+              </div>
             </div>
           </div>
 

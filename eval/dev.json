@@ -1,0 +1,547 @@
+[
+  {
+    "id": "BM-01",
+    "name": "FIA Cyber Crime Arrest & Freeze Coercion",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 600000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Rashid Mehmood (Age 71)",
+      "account_age_days": 3500,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Tariq Aziz",
+      "iban": "PK21MEZN00918273645019",
+      "account_age_days": 3,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Inspector Tariq here from FIA Cyber Crime Wing. Your CNIC is involved in hawala money laundering. Section 21 arrest warrant issued. Transfer Rs. 600,000 to state verification IBAN PK21MEZN00918273645019 within 10 minutes or police will breach your premises.",
+    "graph_context": {
+      "account_age_days": 3,
+      "kyc_tier": "Tier 0",
+      "fan_in": 1,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-02",
+    "name": "State Bank BISP Grant Verification Scam",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 85000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Kausar Parveen (Housewife)",
+      "account_age_days": 1200,
+      "kyc_tier": "Tier 1"
+    },
+    "receiver": {
+      "name": "Kamran Khan",
+      "iban": "PK92HABB00881920394812",
+      "account_age_days": 5,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Assalam-o-Alaikum, State Bank of Pakistan BISP Directorate. Congratulations your Rs. 150,000 grant is approved. To activate tax clearance ledger transfer refundable processing fee of Rs. 85,000 immediately.",
+    "graph_context": {
+      "account_age_days": 5,
+      "kyc_tier": "Tier 0",
+      "fan_in": 4,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-03",
+    "name": "PTA SIM Biometric Block Urgent Threat",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 120000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Tariq Anwar",
+      "account_age_days": 1800,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Waqas Shabbir",
+      "iban": "PK55BAHL00019283746519",
+      "account_age_days": 6,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "This is Pakistan Telecommunication Authority automated alert. All 5 SIMs on your identity will be blocked within 30 minutes due to biometric irregularity. Send Rs. 120,000 security bond to biometric officer account or face nationwide telecom blacklist.",
+    "graph_context": {
+      "account_age_days": 6,
+      "kyc_tier": "Tier 0",
+      "fan_in": 3,
+      "shared_device": false
+    }
+  },
+  {
+    "id": "BM-04",
+    "name": "Military Officer Impersonator Vehicle Auction Scam",
+    "type": "FRAUD",
+    "subtype": "IMPERSONATION",
+    "expected_verdict": "QUARANTINED",
+    "amount": 250000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Usman Ghani",
+      "account_age_days": 890,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Major Asad (Mule)",
+      "iban": "PK33UNIL00029384756102",
+      "account_age_days": 8,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Major Asad speaking from GHQ Logistics Rawalpindi. Toyota Fortuner army auction allotment confirmed for you. Transfer earnest token Rs. 250,000 right now before 3:00 PM tender deadline or vehicle will be allocated to next bidder.",
+    "graph_context": {
+      "account_age_days": 8,
+      "kyc_tier": "Tier 0",
+      "fan_in": 2,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-05",
+    "name": "Telegram Task Scam Money Mule Structuring",
+    "type": "FRAUD",
+    "subtype": "SMURFING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 48000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Task Victim Ring 01",
+      "account_age_days": 40,
+      "kyc_tier": "Tier 1"
+    },
+    "receiver": {
+      "name": "Student Mule Aggregator",
+      "iban": "PK77JSBL00039281726354",
+      "account_age_days": 11,
+      "kyc_tier": "Tier 1"
+    },
+    "transcript": "Telegram Admin: Complete YouTube like task #4. Deposit Rs. 48,000 into crypto commission account to unlock VIP tier 5 payout of Rs. 95,000 within 5 minutes. Hurry crypto block closes in 4 minutes.",
+    "graph_context": {
+      "account_age_days": 11,
+      "kyc_tier": "Tier 1",
+      "fan_in": 8,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-06",
+    "name": "WAPDA Bill Disconnection Emergency Vishing",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 75000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Saeed Akhtar (Elderly Merchant)",
+      "account_age_days": 2100,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "WAPDA Sub-Officer (Mule)",
+      "iban": "PK19BAFL00091827364502",
+      "account_age_days": 7,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "LESCO WAPDA Emergency Team. Your commercial meter connection will be severed in 15 minutes due to overdue fuel price adjustment arrears. Pay Rs. 75,000 on Raast ID immediately to prevent grid cutoff.",
+    "graph_context": {
+      "account_age_days": 7,
+      "kyc_tier": "Tier 0",
+      "fan_in": 5,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-07",
+    "name": "Virtual Kidnapping Urgent Extortion Scam",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 300000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Mrs. Nasreen Akhtar",
+      "account_age_days": 1600,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Zubair Hashmi",
+      "iban": "PK66MCIB00019283746591",
+      "account_age_days": 2,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Listen to me woman, we have captured your son from university. He is tied in our trunk! If you call police or hang up the phone he is dead. Transfer Rs. 300,000 to this Raast account right now or his fingers will be delivered to your door!",
+    "graph_context": {
+      "account_age_days": 2,
+      "kyc_tier": "Tier 0",
+      "fan_in": 1,
+      "shared_device": false
+    }
+  },
+  {
+    "id": "BM-08",
+    "name": "Overseas Son Police Custody Bail Imposter",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 500000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Chaudhry Riaz (Father)",
+      "account_age_days": 4000,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Embassy Agent (Mule)",
+      "iban": "PK44FAYS00039281726351",
+      "account_age_days": 9,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Chaudhry sahab, Dubai Police custody officer speaking. Your son Hamza has been arrested in a traffic accident case. He is in Al-Barsha jail. Transfer 500,000 PKR consular bail bond within 20 minutes before magistrate remand hearing.",
+    "graph_context": {
+      "account_age_days": 9,
+      "kyc_tier": "Tier 0",
+      "fan_in": 3,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-09",
+    "name": "Credit Card Reward Points Expiry OTP Harvesting",
+    "type": "FRAUD",
+    "subtype": "CREDENTIAL_HARVESTING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 95000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Babar Azam Siddiqui",
+      "account_age_days": 1100,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Points Redemption Gateway",
+      "iban": "PK88SNBL00029384756192",
+      "account_age_days": 13,
+      "kyc_tier": "Tier 1"
+    },
+    "transcript": "Bank Security Department: Your 45,000 reward points worth Rs. 95,000 expire at midnight. We are processing auto-credit into your account. Tell me the 6 digit authorization passcode sent on your phone to complete verification.",
+    "graph_context": {
+      "account_age_days": 13,
+      "kyc_tier": "Tier 1",
+      "fan_in": 6,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-10",
+    "name": "Customs Narcotics Parcel Seizure Extortion",
+    "type": "FRAUD",
+    "subtype": "VISHING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 750000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Dr. Sohail Qureshi",
+      "account_age_days": 2900,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Anti-Narcotics Vault",
+      "iban": "PK01BIPL00019283746599",
+      "account_age_days": 4,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Anti-Narcotics Force & DHL Customs Joint Team. A contraband international package containing 400g ketamine with your passport details has been intercepted at Karachi cargo. Non-bailable FIR #892 registered. Deposit 750,000 PKR non-involvement escrow clearance immediately.",
+    "graph_context": {
+      "account_age_days": 4,
+      "kyc_tier": "Tier 0",
+      "fan_in": 2,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-11",
+    "name": "Student Freelance Account Smurfing Ring",
+    "type": "FRAUD",
+    "subtype": "SMURFING",
+    "expected_verdict": "QUARANTINED",
+    "amount": 180000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Smurf Syndicate Feeders",
+      "account_age_days": 15,
+      "kyc_tier": "Tier 1"
+    },
+    "receiver": {
+      "name": "Student Account Mule",
+      "iban": "PK29DIBP00091827364512",
+      "account_age_days": 20,
+      "kyc_tier": "Tier 1"
+    },
+    "transcript": "Telegram Syndicate: Rent your UBL and DIB accounts for 20,000 monthly commission. Four incoming payments of Rs. 45,000 structured to bypass anti-money laundering monitoring, drain immediately to Tether USDT on Binance.",
+    "graph_context": {
+      "account_age_days": 20,
+      "kyc_tier": "Tier 1",
+      "fan_in": 7,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-12",
+    "name": "Rapid Circular Wash-Trading Mule Cluster",
+    "type": "FRAUD",
+    "subtype": "MULE_NETWORK",
+    "expected_verdict": "QUARANTINED",
+    "amount": 220000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Cluster Node Alpha",
+      "account_age_days": 25,
+      "kyc_tier": "Tier 1"
+    },
+    "receiver": {
+      "name": "Cluster Node Beta",
+      "iban": "PK45SONE00019283746501",
+      "account_age_days": 22,
+      "kyc_tier": "Tier 1"
+    },
+    "transcript": "Automated API Bot: Routing transaction batch #991 through circular topology A -> B -> C -> A to obscure beneficial ownership before terminal crypto cashout.",
+    "graph_context": {
+      "account_age_days": 22,
+      "kyc_tier": "Tier 1",
+      "fan_in": 5,
+      "circular_flow": true,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-13",
+    "name": "High-Velocity Fan-In with Instant Physical ATM Drain",
+    "type": "FRAUD",
+    "subtype": "MULE_NETWORK",
+    "expected_verdict": "QUARANTINED",
+    "amount": 400000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Multiple Coerced Victims",
+      "account_age_days": 1500,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Rapid Cashout Mule",
+      "iban": "PK90ALFH00019283746588",
+      "account_age_days": 8,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Mule Coordinator: Account PK90ALFH00019283746588 funded with 400k. Card puller is stationed at Saddar ATM terminal right now. Pull maximum cash limit before freeze flag lands.",
+    "graph_context": {
+      "account_age_days": 8,
+      "kyc_tier": "Tier 0",
+      "fan_in": 9,
+      "drain_velocity_mins": 3.5,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-14",
+    "name": "Bank IT Helpdesk Screen-Sharing Malware Coercion",
+    "type": "FRAUD",
+    "subtype": "COERCION",
+    "expected_verdict": "QUARANTINED",
+    "amount": 320000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Salma Khatoon (Teacher)",
+      "account_age_days": 2200,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "IT Security Server (Mule)",
+      "iban": "PK11FWBL00088192039481",
+      "account_age_days": 10,
+      "kyc_tier": "Tier 0"
+    },
+    "transcript": "Bank IT Security Helpline: Ma'am a cyber malware is draining your account right now. Install our security patch app from link or open AnyDesk screen share immediately. Keep screen on while we move your balance to safe clearing account.",
+    "graph_context": {
+      "account_age_days": 10,
+      "kyc_tier": "Tier 0",
+      "fan_in": 3,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-15",
+    "name": "Predatory Digital Loan App Extortion Transfer",
+    "type": "FRAUD",
+    "subtype": "EXTORTION",
+    "expected_verdict": "QUARANTINED",
+    "amount": 150000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Junaid Khan (Clerk)",
+      "account_age_days": 900,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Loan App Recovery Mule",
+      "iban": "PK50SBLP00091827364501",
+      "account_age_days": 14,
+      "kyc_tier": "Tier 1"
+    },
+    "transcript": "Easy Loan Recovery Agent: Listen Junaid, you have 1 hour. We have copied all your phone contacts, gallery photos, and family numbers. If Rs. 150,000 penalty is not paid to this wallet by 4 PM, your morphed photos will be sent to your employer and relatives.",
+    "graph_context": {
+      "account_age_days": 14,
+      "kyc_tier": "Tier 1",
+      "fan_in": 6,
+      "shared_device": true
+    }
+  },
+  {
+    "id": "BM-16",
+    "name": "Urgent University Semester Fee Payment",
+    "type": "CLEAN",
+    "subtype": "EDUCATION",
+    "expected_verdict": "CLEARED",
+    "amount": 220000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Mansoor Tariq (Parent)",
+      "account_age_days": 2400,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "National University of Sciences and Technology (NUST)",
+      "iban": "PK35HABB00021948291005",
+      "account_age_days": 3800,
+      "kyc_tier": "Tier 3 Corporate"
+    },
+    "transcript": "Father: Mansoor here, paying my son Bilal Mansoor's 5th semester tuition fee (Challan #NUST-2026-FEE-88192). Today is the absolute last deadline before late penalty and registration drop. Transferring Rs. 220,000 to official NUST Askari/HBL challan account.",
+    "graph_context": {
+      "account_age_days": 3800,
+      "kyc_tier": "Tier 3 Corporate",
+      "fan_in": 1200,
+      "shared_device": false,
+      "is_verified_institution": true
+    }
+  },
+  {
+    "id": "BM-17",
+    "name": "Emergency Hospital ICU Surgery Deposit",
+    "type": "CLEAN",
+    "subtype": "HEALTHCARE",
+    "expected_verdict": "CLEARED",
+    "amount": 400000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Hamid Raza (Brother)",
+      "account_age_days": 3100,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Shifa International Hospital Emergency Admissions",
+      "iban": "PK20AKBL00039281726359",
+      "account_age_days": 4100,
+      "kyc_tier": "Tier 3 Corporate"
+    },
+    "transcript": "Caller: Hospital admissions counter, emergency trauma center. Patient Zain Raza brought in road accident. Immediate surgical stabilization deposit required: Rs. 400,000 to Shifa International Askari Bank title account. Receipt presented at counter.",
+    "graph_context": {
+      "account_age_days": 4100,
+      "kyc_tier": "Tier 3 Corporate",
+      "fan_in": 450,
+      "shared_device": false,
+      "is_verified_institution": true
+    }
+  },
+  {
+    "id": "BM-18",
+    "name": "Real Estate Sub-Registrar Token Earnest Money",
+    "type": "CLEAN",
+    "subtype": "REAL_ESTATE",
+    "expected_verdict": "CLEARED",
+    "amount": 500000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Naveed Afzal (Buyer)",
+      "account_age_days": 1900,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Malik property sellers & builders verified title",
+      "iban": "PK50MEZN00019283746599",
+      "account_age_days": 1800,
+      "kyc_tier": "Tier 2"
+    },
+    "transcript": "Buyer: Naveed Afzal at Sub-Registrar office F-8 Islamabad with deed writers. Transferring earnest money token Rs. 500,000 for Plot 14, Street 12, Park View Enclave as per registered agreement to sell witnessed by stamp vendor.",
+    "graph_context": {
+      "account_age_days": 1800,
+      "kyc_tier": "Tier 2",
+      "fan_in": 8,
+      "shared_device": false
+    }
+  },
+  {
+    "id": "BM-19",
+    "name": "Port Demurrage & Customs Clearance Commercial Payment",
+    "type": "CLEAN",
+    "subtype": "COMMERCIAL",
+    "expected_verdict": "CLEARED",
+    "amount": 450000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Apex Impex Trading Corp",
+      "account_age_days": 2700,
+      "kyc_tier": "Tier 3 Corporate"
+    },
+    "receiver": {
+      "name": "Karachi International Container Terminal (KICT)",
+      "iban": "PK12SCBL00049281726350",
+      "account_age_days": 4500,
+      "kyc_tier": "Tier 3 Corporate"
+    },
+    "transcript": "Commercial Logistics Manager: Urgent payment of Rs. 450,000 for container clearance bill #KICT-DEM-99214 to avoid additional 24-hour port demurrage surcharge. Paid to Karachi International Container Terminal official collection account.",
+    "graph_context": {
+      "account_age_days": 4500,
+      "kyc_tier": "Tier 3 Corporate",
+      "fan_in": 3200,
+      "shared_device": false,
+      "is_verified_institution": true
+    }
+  },
+  {
+    "id": "BM-20",
+    "name": "Wedding Marquee Event Balance Settlement",
+    "type": "CLEAN",
+    "subtype": "PERSONAL_COMMERCIAL",
+    "expected_verdict": "CLEARED",
+    "amount": 350000.0,
+    "currency": "PKR",
+    "sender": {
+      "name": "Zubair Hashmi (Groom's Brother)",
+      "account_age_days": 1400,
+      "kyc_tier": "Tier 2"
+    },
+    "receiver": {
+      "name": "Grand Ambassador Marquee Events",
+      "iban": "PK98BAFL00039281726350",
+      "account_age_days": 1300,
+      "kyc_tier": "Tier 2"
+    },
+    "transcript": "Zubair here: Paying final settlement balance of Rs. 350,000 for wedding reception hall booking for tonight 300 guests catering. Agreement receipt #GAM-8819 issued by banquet event manager.",
+    "graph_context": {
+      "account_age_days": 1300,
+      "kyc_tier": "Tier 2",
+      "fan_in": 40,
+      "shared_device": false
+    }
+  }
+]

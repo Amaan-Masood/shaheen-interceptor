@@ -123,7 +123,7 @@ export default function ScenarioSimulator({
               ACOUSTIC FREQUENCY SPECTRUM
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-[#64748B]">RMS: -14.2 dBFS</span>
+              <span className="text-[#64748B]">RMS: -14.2 dBFS (SIMULATED)</span>
               <span className={`px-1.5 py-0.2 text-[9px] font-black ${isClean ? "bg-[#10B981]/20 text-[#10B981]" : "bg-[#EF4444]/20 text-[#EF4444]"}`}>
                 {isClean ? "CLEARED" : "COERCION ANOMALY"}
               </span>
