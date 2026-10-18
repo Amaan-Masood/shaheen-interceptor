@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GitCommit, ArrowRight, Layers, ShieldCheck, AlertOctagon, ExternalLink, CheckCircle2, ChevronRight, Landmark, CreditCard, Ban, Shield, Sparkles } from "lucide-react";
+import { GitCommit, ArrowRight, Layers, ShieldCheck, AlertOctagon, ExternalLink, CheckCircle2, Shield, AlertTriangle, Radio } from "lucide-react";
 
 export default function NetworkGraph({ topology, isClean }) {
   const [viewMode, setViewMode] = useState("FLOW"); // "FLOW" | "MAP"
@@ -8,296 +8,349 @@ export default function NetworkGraph({ topology, isClean }) {
   const nodes = Array.isArray(topology?.nodes) ? topology.nodes : [];
   const edges = Array.isArray(topology?.edges) ? topology.edges : [];
 
-  // Compute normalized node coordinates for SVG viewBox="0 0 840 360"
+  // Compute node coordinates map for SVG viewBox="0 0 860 360"
   const nodeMap = {};
-  nodes.forEach((n, idx) => {
-    let x = n?.x !== undefined ? n.x : 100 + ((idx % 4) * 190);
-    let y = n?.y !== undefined ? n.y : 130 + (Math.floor(idx / 4) * 120);
+  const totalNodes = nodes.length;
 
-    // Compress and scale rightward nodes into the canvas safely
-    if (x >= 700) x = 680;
-    else if (x >= 500) x = 480;
-    else if (x >= 300) x = 290;
-    else x = 90;
+  if (totalNodes <= 3) {
+    // Linear pipeline layout for direct flows (e.g. Safe Hospital: Patient -> Hospital -> Vendor)
+    const xCoords = totalNodes === 2 ? [240, 620] : [160, 430, 700];
+    nodes.forEach((n, idx) => {
+      nodeMap[n.id || idx] = {
+        ...n,
+        x: xCoords[idx] !== undefined ? xCoords[idx] : (160 + idx * 260),
+        y: 180
+      };
+    });
+  } else {
+    // Multi-hop / branching layout
+    nodes.forEach((n, idx) => {
+      let x = n?.x;
+      let y = n?.y;
 
-    nodeMap[n?.id || idx] = { ...n, x, y };
-  });
+      if (x === undefined || y === undefined) {
+        const col = Math.min(Math.floor(idx / 2), 3);
+        const row = idx % 2;
+        x = 120 + col * 200;
+        y = 120 + row * 120;
+      } else {
+        x = Math.max(100, Math.min(x, 740));
+        y = Math.max(80, Math.min(y, 280));
+      }
+
+      nodeMap[n.id || idx] = { ...n, x, y };
+    });
+  }
 
   return (
-    <div className="bezel-shell p-2 rounded-3xl h-full flex flex-col">
-      <div className="bezel-core p-4 sm:p-5 rounded-[calc(1.5rem-0.25rem)] flex-1 flex flex-col space-y-4 overflow-hidden">
-        {/* Top Header & View Toggle */}
-        <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#38BDF8]/15 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8]">
-              <Layers className="w-4 h-4" />
+    <div className="bg-[#0A0E17] border border-white/[0.08] rounded-xl p-3 sm:p-4 flex flex-col h-full space-y-3 shadow-xl">
+      {/* Top Header & View Toggle */}
+      <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.08]">
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-[#00F0FF]" />
+          <div>
+            <div className="font-mono text-xs font-bold text-white tracking-wider uppercase">
+              [ MONEY_TRAIL // 3-HOP TOPOLOGY ]
             </div>
-            <div>
-              <div className="font-extrabold text-sm sm:text-base text-white tracking-tight font-display">
-                Money Trail — Where was the money going?
-              </div>
-              <div className="text-[11px] text-[#94A3B8]">
-                {isClean ? "Direct institutional clearance" : "Multi-hop structuring and off-ramp detection"}
-              </div>
+            <div className="text-[10px] font-mono text-[#64748B]">
+              {isClean ? "Direct institutional clearance" : "Multi-hop structuring and off-ramp detection"}
             </div>
-          </div>
-
-          {/* View Switcher: Step Flow vs Node Map */}
-          <div className="flex items-center gap-1 bg-[#090F1C] p-1 rounded-full text-xs border border-white/[0.08] shadow-inner">
-            <button
-              type="button"
-              onClick={() => setViewMode("FLOW")}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                viewMode === "FLOW"
-                  ? "bg-gradient-to-r from-[#1E293B] to-[#334155] text-white shadow-md"
-                  : "text-[#94A3B8] hover:text-white"
-              }`}
-            >
-              Step Flow
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("MAP")}
-              className={`px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
-                viewMode === "MAP"
-                  ? "bg-gradient-to-r from-[#1E293B] to-[#334155] text-white shadow-md"
-                  : "text-[#94A3B8] hover:text-white"
-              }`}
-            >
-              Network Map
-            </button>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto pr-1">
-          {viewMode === "FLOW" ? (
-            /* Luminous Step Flow */
-            <div className="space-y-3 max-w-2xl mx-auto py-1">
-              {isClean ? (
-                /* Clean Hospital Direct Flow */
-                <div className="rounded-2xl bg-[#0D1F17] border border-[#10B981]/40 p-5 space-y-4 shadow-xl relative overflow-hidden">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/40 flex items-center justify-center text-[#34D399] font-black text-sm">
-                      1
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-wider">Originator Account</div>
-                      <div className="font-bold text-white text-sm">Farhan Siddiqui (Standard Chartered)</div>
-                      <div className="text-xs text-[#94A3B8]">Verified Biometric Tier 2 • Regular Medical Savings</div>
-                    </div>
-                  </div>
+        {/* View Switcher: Step Flow vs Node Map */}
+        <div className="flex items-center gap-1 bg-[#080B11] p-1 rounded-md text-xs font-mono border border-white/[0.06]">
+          <button
+            type="button"
+            onClick={() => setViewMode("FLOW")}
+            className={`px-2.5 py-1 rounded transition-all cursor-pointer font-bold ${
+              viewMode === "FLOW"
+                ? "bg-[#1E293B] text-white shadow-sm"
+                : "text-[#94A3B8] hover:text-white"
+            }`}
+          >
+            STEP FLOW
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("MAP")}
+            className={`px-2.5 py-1 rounded transition-all cursor-pointer font-bold ${
+              viewMode === "MAP"
+                ? "bg-[#1E293B] text-white shadow-sm"
+                : "text-[#94A3B8] hover:text-white"
+            }`}
+          >
+            NETWORK MAP
+          </button>
+        </div>
+      </div>
 
-                  <div className="pl-5 border-l-2 border-[#10B981]/50 ml-5 py-2">
-                    <div className="bg-[#070D12] rounded-xl p-3 text-xs text-[#34D399] flex items-center justify-between border border-[#10B981]/25 shadow-inner">
-                      <span className="flex items-center gap-2">
-                        <ArrowRight className="w-4 h-4 text-[#10B981]" />
-                        <span>Raast Direct Transfer: <strong>Rs. 380,000</strong></span>
-                      </span>
-                      <span className="font-mono text-[10px] font-bold text-[#10B981] bg-[#10B981]/15 px-2.5 py-0.5 rounded-full border border-[#10B981]/30">
-                        CLEARED (3 SEC)
-                      </span>
-                    </div>
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto pr-1">
+        {viewMode === "FLOW" ? (
+          /* Step Flow Narrative */
+          <div className="space-y-2.5 max-w-2xl mx-auto py-1 font-mono text-xs">
+            {isClean ? (
+              /* Clean Hospital Direct Flow */
+              <div className="rounded-lg bg-[#0C1712] border border-[#10B981]/40 p-4 space-y-3.5 shadow-md">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#10B981]/20 border border-[#10B981]/40 flex items-center justify-center text-[#10B981] font-bold text-xs">
+                    1
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-[#10B981] text-black font-black flex items-center justify-center shadow-lg shadow-[#10B981]/30">
-                      <CheckCircle2 className="w-5 h-5 text-black" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[10px] text-[#34D399] font-bold uppercase tracking-wider">Verified Healthcare Destination</div>
-                      <div className="font-bold text-white text-sm">Shaukat Khanum Memorial Cancer Hospital</div>
-                      <div className="text-xs text-[#94A3B8]">Tier 3 Corporate Entity • Askari Bank Official Collection Account</div>
-                    </div>
+                  <div className="flex-1">
+                    <div className="text-[9.5px] text-[#64748B] font-bold uppercase">ORIGINATOR ACCOUNT</div>
+                    <div className="font-bold text-white text-xs">Farhan Siddiqui (Standard Chartered Bank)</div>
+                    <div className="text-[10.5px] text-[#94A3B8] font-sans">Verified Biometric Tier 2 • Regular Medical Savings Account</div>
                   </div>
                 </div>
-              ) : (
-                /* Multi-Hop Mule Scam Flow */
-                <div className="space-y-2.5">
-                  {/* Step 1: Victim Originator */}
-                  <div className="rounded-2xl bg-[#0D1526] border border-white/[0.08] p-4 flex items-center gap-3.5 shadow-md">
-                    <div className="w-10 h-10 rounded-2xl bg-[#38BDF8]/20 border border-[#38BDF8]/40 flex items-center justify-center text-[#38BDF8] font-black text-sm">
-                      1
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[10px] text-[#94A3B8] uppercase font-bold tracking-wider">Victim's Originating Account</div>
-                      <div className="font-bold text-white text-sm">Haji Abdul Rehman (Retired Officer)</div>
-                      <div className="text-xs text-[#94A3B8]">Attempted extortion deposit: Rs. 450,000 via Raast</div>
-                    </div>
-                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30">
-                      Victim
+
+                <div className="pl-4 border-l-2 border-[#10B981]/50 ml-4 py-1">
+                  <div className="bg-[#080B11] rounded p-2.5 text-[11px] text-[#10B981] flex items-center justify-between border border-[#10B981]/25">
+                    <span className="flex items-center gap-2">
+                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>Raast Direct Transfer: <strong>Rs. 380,000</strong></span>
                     </span>
-                  </div>
-
-                  {/* Flow Arrow */}
-                  <div className="flex justify-center -my-1 text-[#EF4444]">
-                    <ArrowRight className="w-4 h-4 rotate-90" />
-                  </div>
-
-                  {/* Step 2: Primary Mule Hub */}
-                  <div className="rounded-2xl bg-[#1F0E14] border border-[#EF4444]/60 p-4 flex items-center gap-3.5 shadow-xl shadow-[#EF4444]/10">
-                    <div className="w-10 h-10 rounded-2xl bg-[#EF4444] text-white flex items-center justify-center font-black text-sm shadow-md shadow-[#EF4444]/40">
-                      2
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-[#F87171] uppercase font-bold tracking-wider">Primary Mule Hub</span>
-                        <span className="text-[9px] bg-[#EF4444] text-white px-2 py-0.2 rounded-full font-black">
-                          4 DAYS OLD
-                        </span>
-                      </div>
-                      <div className="font-bold text-white text-sm">Muhammad Bilal (Habib Bank Ltd)</div>
-                      <div className="text-xs text-[#FCA5A5]">First destination before rapid layering fan-out</div>
-                    </div>
-                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#EF4444]/25 text-[#F87171] border border-[#EF4444]/40">
-                      Mule Layer 1
-                    </span>
-                  </div>
-
-                  {/* Flow Arrow */}
-                  <div className="flex justify-center -my-1 text-[#A855F7]">
-                    <ArrowRight className="w-4 h-4 rotate-90" />
-                  </div>
-
-                  {/* Step 3: Structuring Fan-Out */}
-                  <div className="rounded-2xl bg-[#170E24] border border-[#A855F7]/50 p-4 flex items-center gap-3.5 shadow-md">
-                    <div className="w-10 h-10 rounded-2xl bg-[#A855F7]/25 border border-[#A855F7]/40 flex items-center justify-center text-[#C084FC] font-black text-sm">
-                      3
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[10px] text-[#C084FC] uppercase font-bold tracking-wider">Structuring Split (2 Secondary Accounts)</div>
-                      <div className="font-bold text-white text-sm">Kashif Mehmood & Hamza Tariq</div>
-                      <div className="text-xs text-[#94A3B8]">Rs. 225k & Rs. 220k split in 90 seconds to evade AML radar</div>
-                    </div>
-                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#A855F7]/20 text-[#C084FC] border border-[#A855F7]/30">
-                      Mules Layer 2
-                    </span>
-                  </div>
-
-                  {/* Flow Arrow */}
-                  <div className="flex justify-center -my-1 text-[#F59E0B]">
-                    <ArrowRight className="w-4 h-4 rotate-90" />
-                  </div>
-
-                  {/* Step 4: Final Cash-Out Points */}
-                  <div className="rounded-2xl bg-[#1C140A] border border-[#F59E0B]/60 p-4 flex items-center gap-3.5 shadow-xl shadow-[#F59E0B]/10">
-                    <div className="w-10 h-10 rounded-2xl bg-[#F59E0B] text-black flex items-center justify-center font-black text-sm shadow-md shadow-[#F59E0B]/30">
-                      4
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[10px] text-[#FBBF24] uppercase font-bold tracking-wider">Targeted Off-Ramp Liquidation</div>
-                      <div className="font-bold text-white text-sm">Binance P2P Escrow & Cash Over Counter</div>
-                      <div className="text-xs text-[#FDE68A]">Pre-settlement freeze prevented cash withdrawal from Rawalpindi ATM</div>
-                    </div>
-                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#F59E0B]/25 text-[#FBBF24] border border-[#F59E0B]/40">
-                      Off-Ramp
+                    <span className="font-mono text-[9.5px] font-bold bg-[#10B981]/15 px-2 py-0.5 rounded border border-[#10B981]/30">
+                      CLEARED (3 SEC)
                     </span>
                   </div>
                 </div>
-              )}
+
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#10B981] text-black font-black flex items-center justify-center shadow-md">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[9.5px] text-[#10B981] font-bold uppercase">VERIFIED HEALTHCARE DESTINATION</div>
+                    <div className="font-bold text-white text-xs">Shaukat Khanum Memorial Cancer Hospital</div>
+                    <div className="text-[10.5px] text-[#94A3B8] font-sans">Tier 3 Corporate Entity • Askari Bank Official Collection Account</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Multi-Hop Mule Scam Flow */
+              <div className="space-y-2">
+                {/* Step 1: Victim Originator */}
+                <div className="rounded-lg bg-[#0D121D] border border-white/[0.06] p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center text-[#00F0FF] font-bold text-xs">
+                    1
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[9px] text-[#64748B] uppercase font-bold">VICTIM ORIGINATOR</div>
+                    <div className="font-bold text-white text-xs">Haji Saleem (Senior Citizen, 68 yrs)</div>
+                    <div className="text-[10px] text-[#94A3B8] font-sans">Targeted via spoofed VoIP call impersonating FIA Cyber Crime</div>
+                  </div>
+                  <span className="text-[10px] font-bold text-white bg-[#080B11] px-2 py-1 rounded border border-white/10">
+                    Rs. 450,000
+                  </span>
+                </div>
+
+                {/* Step 2: SBP Pre-Settlement Interlock Freeze */}
+                <div className="rounded-lg bg-[#180C11] border border-[#F43F5E]/60 p-3 flex items-center gap-3 shadow-md">
+                  <div className="w-8 h-8 rounded-md bg-[#F43F5E] text-white flex items-center justify-center font-black text-xs shadow-md">
+                    2
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[9px] text-[#F43F5E] uppercase font-bold tracking-wider">
+                      SHAHEEN PRE-SETTLEMENT INTERLOCK (FUNDS QUARANTINED)
+                    </div>
+                    <div className="font-bold text-white text-xs">Primary Mule: Muhammad Bilal (Meezan Bank)</div>
+                    <div className="text-[10px] text-[#94A3B8] font-sans">Account opened 4 days ago with zero history. Trapped before settlement.</div>
+                  </div>
+                  <span className="text-[9.5px] font-bold px-2 py-0.5 rounded bg-[#F43F5E]/20 text-[#F43F5E] border border-[#F43F5E]/40">
+                    FROZEN
+                  </span>
+                </div>
+
+                {/* Step 3: Layering Destination */}
+                <div className="rounded-lg bg-[#140F0A] border border-[#F59E0B]/30 p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#F59E0B]/20 border border-[#F59E0B]/40 flex items-center justify-center text-[#F59E0B] font-bold text-xs">
+                    3
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[9px] text-[#F59E0B] uppercase font-bold">PREVENTED LAYERING HOP</div>
+                    <div className="font-bold text-white text-xs">Secondary Mules: Kashif Mehmood & Hamza Tariq</div>
+                    <div className="text-[10px] text-[#94A3B8] font-sans">Rapid fan-out split into 2 x Rs. 225,000 intended transfers.</div>
+                  </div>
+                  <span className="text-[9.5px] font-bold px-2 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30">
+                    BLOCKED
+                  </span>
+                </div>
+
+                {/* Step 4: Final Cash-Out Points */}
+                <div className="rounded-lg bg-[#140F0A] border border-[#F59E0B]/40 p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-[#F59E0B] text-black flex items-center justify-center font-bold text-xs">
+                    4
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[9px] text-[#F59E0B] uppercase font-bold">TARGETED OFF-RAMP LIQUIDATION</div>
+                    <div className="font-bold text-white text-xs">Binance P2P Escrow & ATM Cash Withdrawal</div>
+                    <div className="text-[10px] text-[#94A3B8] font-sans">Pre-settlement freeze prevented cash withdrawal from Rawalpindi ATM.</div>
+                  </div>
+                  <span className="text-[9.5px] font-bold px-2 py-0.5 rounded bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30">
+                    OFF-RAMP
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Interactive Network Map (Tactical SVG Canvas) */
+          <div className="relative w-full h-[360px] rounded-lg bg-[#070A0F] border border-white/[0.08] overflow-hidden flex items-center justify-center">
+            {/* Top Tactical HUD Banner */}
+            <div className="absolute top-2 left-3 right-3 z-10 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+              <span className={`px-2 py-0.5 rounded border font-bold ${
+                isClean
+                  ? "bg-[#10B981]/20 text-[#10B981] border-[#10B981]/40"
+                  : "bg-[#F43F5E]/20 text-[#F43F5E] border-[#F43F5E]/40"
+              }`}>
+                {isClean
+                  ? "SETTLEMENT AUTHORIZED // SBP CLEARANCE APPROVED"
+                  : "PRE-SETTLEMENT INTERLOCK ACTIVE // FUNDS FROZEN AT SWITCH LEVEL"}
+              </span>
+              <span className="text-[#64748B]">NODES: {nodes.length} // EDGES: {edges.length}</span>
             </div>
-          ) : (
-            /* Interactive Network Map (SVG Canvas) */
-            <div className="relative w-full h-[360px] rounded-2xl bg-[#070B14] border border-white/[0.08] overflow-hidden flex items-center justify-center">
-              <svg viewBox="0 0 840 360" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                  <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#38BDF8" />
-                    <stop offset="50%" stopColor="#EF4444" />
-                    <stop offset="100%" stopColor="#F59E0B" />
-                  </linearGradient>
-                </defs>
 
-                {/* Edges */}
-                {edges.map((edge, idx) => {
-                  const source = nodeMap[edge.source];
-                  const target = nodeMap[edge.target];
-                  if (!source || !target) return null;
+            <svg viewBox="0 0 860 360" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="laserGradScam" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#00F0FF" />
+                  <stop offset="50%" stopColor="#F43F5E" />
+                  <stop offset="100%" stopColor="#F59E0B" />
+                </linearGradient>
+                <linearGradient id="laserGradClean" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#34D399" />
+                </linearGradient>
+              </defs>
 
-                  return (
-                    <g key={idx}>
-                      <line
-                        x1={source.x}
-                        y1={source.y}
-                        x2={target.x}
-                        y2={target.y}
-                        stroke="#EF4444"
-                        strokeWidth="2"
-                        className="flow-animated"
-                        opacity="0.8"
-                      />
-                    </g>
-                  );
-                })}
+              {/* Edge Connections */}
+              {edges.map((edge, idx) => {
+                const source = nodeMap[edge.source];
+                const target = nodeMap[edge.target];
+                if (!source || !target) return null;
 
-                {/* Nodes */}
-                {nodes.map((node, idx) => {
-                  const coords = nodeMap[node.id || idx];
-                  const isSuspicious = node.risk_score && node.risk_score > 50;
+                return (
+                  <g key={idx}>
+                    <line
+                      x1={source.x}
+                      y1={source.y}
+                      x2={target.x}
+                      y2={target.y}
+                      stroke={isClean ? "#10B981" : "#F43F5E"}
+                      strokeWidth="2"
+                      className="flow-animated"
+                      opacity="0.8"
+                    />
+                  </g>
+                );
+              })}
 
-                  return (
-                    <g
-                      key={idx}
-                      transform={`translate(${coords.x}, ${coords.y})`}
-                      className="cursor-pointer group"
-                      onClick={() => setSelectedNode(node)}
-                    >
-                      {/* Pulse Circle */}
-                      <circle
-                        r="22"
-                        fill={isSuspicious ? "rgba(239, 68, 68, 0.2)" : "rgba(56, 189, 248, 0.2)"}
-                        className="animate-ping"
-                      />
-                      {/* Core Circle */}
-                      <circle
-                        r="16"
-                        fill={isSuspicious ? "#EF4444" : "#1E293B"}
-                        stroke={isSuspicious ? "#F87171" : "#38BDF8"}
-                        strokeWidth="2"
-                      />
-                      <text
-                        y="4"
-                        textAnchor="middle"
-                        fill="#FFFFFF"
-                        fontSize="9"
-                        fontWeight="bold"
-                        fontFamily="monospace"
-                      >
-                        {node.id ? node.id.slice(0, 3) : idx + 1}
-                      </text>
-                      <text
-                        y="28"
-                        textAnchor="middle"
-                        fill="#94A3B8"
-                        fontSize="10"
-                        fontWeight="600"
-                      >
-                        {node.label || node.id}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
+              {/* Distinct Node Geometries */}
+              {nodes.map((node, idx) => {
+                const coords = nodeMap[node.id || idx];
+                const isSuspicious = !isClean && node.risk_score && node.risk_score > 50;
+                const isVictim = node.role === "VICTIM" || idx === 0;
+                const isOffRamp = node.role === "CASH_OUT" || node.id?.includes("ATM") || node.id?.includes("BINANCE");
 
-              {/* Node Inspector Drawer */}
-              {selectedNode && (
-                <div className="absolute bottom-3 left-3 right-3 p-3.5 rounded-xl bg-[#0B111E]/95 border border-white/20 backdrop-blur-md flex items-center justify-between text-xs">
-                  <div>
-                    <div className="font-bold text-white text-sm">{selectedNode.label || selectedNode.id}</div>
-                    <div className="text-[#94A3B8] text-[11px]">Type: {selectedNode.type || "Account"} • Bank: {selectedNode.bank || "Habib Bank Ltd"}</div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedNode(null)}
-                    className="text-xs bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1 rounded-lg"
+                return (
+                  <g
+                    key={idx}
+                    transform={`translate(${coords.x}, ${coords.y})`}
+                    className="cursor-pointer group"
+                    onClick={() => setSelectedNode(node)}
                   >
-                    Close
-                  </button>
+                    {/* Node Shape Geometry */}
+                    {isClean ? (
+                      /* Clean Node: Green Circle */
+                      <>
+                        <circle r="18" fill="rgba(16, 185, 129, 0.2)" className="animate-ping" />
+                        <circle r="15" fill="#10B981" stroke="#34D399" strokeWidth="2" />
+                      </>
+                    ) : isVictim ? (
+                      /* Victim Node: Square Shield */
+                      <>
+                        <rect x="-18" y="-18" width="36" height="36" rx="4" fill="rgba(0, 240, 255, 0.2)" className="animate-ping" />
+                        <rect x="-15" y="-15" width="30" height="30" rx="4" fill="#0E1726" stroke="#00F0FF" strokeWidth="2" />
+                      </>
+                    ) : isOffRamp ? (
+                      /* Final Off-Ramp: Pulsing Diamond */
+                      <>
+                        <polygon points="0,-22 22,0 0,22 -22,0" fill="rgba(244, 63, 94, 0.2)" className="animate-ping" />
+                        <polygon points="0,-16 16,0 0,16 -16,0" fill="#F43F5E" stroke="#FF6B8B" strokeWidth="2" />
+                      </>
+                    ) : (
+                      /* Mule Account: Hexagon */
+                      <>
+                        <polygon points="0,-20 18,-10 18,10 0,20 -18,10 -18,-10" fill="rgba(245, 158, 11, 0.2)" className="animate-ping" />
+                        <polygon points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="#F59E0B" stroke="#FDE68A" strokeWidth="2" />
+                      </>
+                    )}
+
+                    {/* Node ID / Code */}
+                    <text
+                      y="4"
+                      textAnchor="middle"
+                      fill={isClean || !isVictim ? "#000000" : "#00F0FF"}
+                      fontSize="9"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                      className="pointer-events-none select-none"
+                    >
+                      {node.id ? node.id.slice(0, 3) : idx + 1}
+                    </text>
+
+                    {/* Node Primary Label */}
+                    <text
+                      y="28"
+                      textAnchor="middle"
+                      fill={isClean ? "#34D399" : (isSuspicious ? "#F87171" : "#94A3B8")}
+                      fontSize="9.5"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                      className="pointer-events-none select-none"
+                    >
+                      {node.label && node.label.length > 24 ? node.label.slice(0, 22) + "…" : (node.label || node.id)}
+                    </text>
+
+                    {/* Bank / Role Subtitle */}
+                    {node.bank && (
+                      <text
+                        y="40"
+                        textAnchor="middle"
+                        fill="#64748B"
+                        fontSize="8.5"
+                        fontFamily="monospace"
+                        className="pointer-events-none select-none"
+                      >
+                        {node.bank}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+
+            {/* Selected Node Forensic Inspector Drawer */}
+            {selectedNode && (
+              <div className="absolute bottom-2 left-2 right-2 p-3 rounded bg-[#0A0E17]/95 border border-white/20 backdrop-blur-md flex items-center justify-between text-xs font-mono">
+                <div>
+                  <div className="font-bold text-white text-xs">{selectedNode.label || selectedNode.id}</div>
+                  <div className="text-[#94A3B8] text-[10px]">
+                    Role: {selectedNode.role || selectedNode.type || "Account"} • Bank: {selectedNode.bank || "Habib Bank Ltd"} • Risk Score: {selectedNode.risk_score || selectedNode.risk || 0}%
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedNode(null)}
+                  className="text-[10px] bg-[#1E293B] hover:bg-[#334155] text-white px-2.5 py-1 rounded cursor-pointer font-bold"
+                >
+                  CLOSE
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

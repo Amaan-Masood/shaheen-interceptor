@@ -331,106 +331,94 @@ export default function App() {
   const isClean = activeScenario.category === "CLEAN_URGENT";
 
   return (
-    <div className="min-h-screen bg-[#060911] text-[#F8FAFC] font-sans flex flex-col antialiased mesh-bg selection:bg-[#EF4444]/30">
+    <div className="min-h-screen bg-[#080B11] text-[#F8FAFC] font-sans flex flex-col antialiased mesh-bg selection:bg-[#F43F5E]/30">
       {/* Top Header Strip */}
       <TopBar
         systemStatus={systemStatus}
         onOpenBenchmark={handleRunBenchmark}
       />
 
-      {/* 3 Prominent Clickable Test Case Cards at the Top (Responsive: Swipe on mobile, Grid on desktop) */}
-      <div className="bg-[#090E1A]/80 border-b border-white/[0.08] px-4 sm:px-6 lg:px-8 py-4 backdrop-blur-xl">
+      {/* Tactical Live Threat Feed / Triage Bar */}
+      <div className="bg-[#080B11] border-b border-white/[0.08] px-4 sm:px-6 lg:px-8 py-2.5">
         <div className="max-w-7xl mx-auto">
-          <div className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-2.5 flex items-center justify-between">
+          <div className="text-[10px] font-mono font-bold text-[#64748B] uppercase tracking-wider mb-2 flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
-              Select a Real Pakistani Fraud Scenario:
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00F0FF] animate-pulse" />
+              <span>LIVE INTERCEPT STREAM // ACTIVE TRIAGE QUEUE:</span>
             </span>
-            <span className="text-[10px] text-[#64748B] font-mono">3 Scenarios Active</span>
+            <span>3 THREAT VECTORS ARMED</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            {/* Scenario 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+            {/* Case 1: FIA Extortion */}
             <div
               onClick={() => handleSelectScenario("SCENARIO_1_VISHING")}
-              className={`w-full p-1.5 rounded-3xl transition-all cursor-pointer relative overflow-hidden card-lift ${
+              className={`p-2.5 rounded-lg border transition-all cursor-pointer font-mono ${
                 selectedScenarioId === "SCENARIO_1_VISHING"
-                  ? "bg-gradient-to-br from-[#EF4444]/30 via-[#EF4444]/10 to-transparent border border-[#EF4444] shadow-xl shadow-[#EF4444]/20 scale-[1.01]"
-                  : "bg-white/[0.02] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04]"
+                  ? "bg-[#160B10] border-[#F43F5E] shadow-md shadow-[#F43F5E]/10"
+                  : "bg-[#0D121D] border-white/[0.06] hover:border-white/20 hover:bg-[#121826]"
               }`}
             >
-              <div className="p-4 rounded-[calc(1.5rem-0.375rem)] bg-gradient-to-b from-[#141018]/90 to-[#0A0D16]/95 h-full flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EF4444]/15 text-[#F87171] border border-[#EF4444]/30 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] animate-pulse" />
-                      CASE 1: FIA EXTORTION
-                    </span>
-                    <span className="text-xs font-mono font-black text-white">Rs. 450,000</span>
-                  </div>
-                  <div className="font-extrabold text-sm text-white font-display">
-                    Fake FIA Inspector Threat
-                  </div>
-                  <div className="text-xs text-[#94A3B8] mt-1 line-clamp-1">
-                    Senior citizen coerced with imminent arrest to force emergency deposit
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-[#F43F5E]/20 text-[#F43F5E] border border-[#F43F5E]/30 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F43F5E] animate-pulse" />
+                  CASE-01 // FIA_EXTORTION
+                </span>
+                <span className="text-xs font-bold text-white">Rs. 450,000</span>
+              </div>
+              <div className="font-bold text-white text-xs truncate">
+                Fake FIA Inspector Threat
+              </div>
+              <div className="text-[10.5px] text-[#94A3B8] font-sans truncate">
+                Senior Citizen // Urgency Level 5/5 • Arrest Coercion
               </div>
             </div>
 
-            {/* Scenario 2 */}
+            {/* Case 2: Smurfing Ring */}
             <div
               onClick={() => handleSelectScenario("SCENARIO_2_SMURFING")}
-              className={`w-full p-1.5 rounded-3xl transition-all cursor-pointer relative overflow-hidden card-lift ${
+              className={`p-2.5 rounded-lg border transition-all cursor-pointer font-mono ${
                 selectedScenarioId === "SCENARIO_2_SMURFING"
-                  ? "bg-gradient-to-br from-[#F59E0B]/30 via-[#F59E0B]/10 to-transparent border border-[#F59E0B] shadow-xl shadow-[#F59E0B]/20 scale-[1.01]"
-                  : "bg-white/[0.02] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04]"
+                  ? "bg-[#16110A] border-[#F59E0B] shadow-md shadow-[#F59E0B]/10"
+                  : "bg-[#0D121D] border-white/[0.06] hover:border-white/20 hover:bg-[#121826]"
               }`}
             >
-              <div className="p-4 rounded-[calc(1.5rem-0.375rem)] bg-gradient-to-b from-[#17130F]/90 to-[#0A0D16]/95 h-full flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#FBBF24] border border-[#F59E0B]/30 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
-                      CASE 2: MULE RING
-                    </span>
-                    <span className="text-xs font-mono font-black text-white">Rs. 270,000</span>
-                  </div>
-                  <div className="font-extrabold text-sm text-white font-display">
-                    Student Account Smurfing Ring
-                  </div>
-                  <div className="text-xs text-[#94A3B8] mt-1 line-clamp-1">
-                    6 rapid micro-transfers under Rs. 50k into newly opened student account
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
+                  CASE-02 // MULE_RING
+                </span>
+                <span className="text-xs font-bold text-white">Rs. 270,000</span>
+              </div>
+              <div className="font-bold text-white text-xs truncate">
+                Student Account Smurfing Ring
+              </div>
+              <div className="text-[10.5px] text-[#94A3B8] font-sans truncate">
+                Fan-In Clustering // 6 Micro-Deposits under Rs. 50k
               </div>
             </div>
 
-            {/* Scenario 3 */}
+            {/* Case 3: Safe Hospital */}
             <div
               onClick={() => handleSelectScenario("SCENARIO_3_CLEAN_HOSPITAL")}
-              className={`w-full p-1.5 rounded-3xl transition-all cursor-pointer relative overflow-hidden card-lift ${
+              className={`p-2.5 rounded-lg border transition-all cursor-pointer font-mono ${
                 selectedScenarioId === "SCENARIO_3_CLEAN_HOSPITAL"
-                  ? "bg-gradient-to-br from-[#10B981]/30 via-[#10B981]/10 to-transparent border border-[#10B981] shadow-xl shadow-[#10B981]/20 scale-[1.01]"
-                  : "bg-white/[0.02] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04]"
+                  ? "bg-[#0C1712] border-[#10B981] shadow-md shadow-[#10B981]/10"
+                  : "bg-[#0D121D] border-white/[0.06] hover:border-white/20 hover:bg-[#121826]"
               }`}
             >
-              <div className="p-4 rounded-[calc(1.5rem-0.375rem)] bg-gradient-to-b from-[#0F1A14]/90 to-[#0A0D16]/95 h-full flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#10B981]/15 text-[#34D399] border border-[#10B981]/30 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                      CASE 3: SAFE HOSPITAL
-                    </span>
-                    <span className="text-xs font-mono font-black text-white">Rs. 380,000</span>
-                  </div>
-                  <div className="font-extrabold text-sm text-white font-display">
-                    Cardiac Emergency Bypass
-                  </div>
-                  <div className="text-xs text-[#94A3B8] mt-1 line-clamp-1">
-                    Legitimate patient deposit to Shaukat Khanum Hospital (0% False Alarms)
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                  CASE-03 // CLEAN_HOSPITAL
+                </span>
+                <span className="text-xs font-bold text-white">Rs. 380,000</span>
+              </div>
+              <div className="font-bold text-white text-xs truncate">
+                Cardiac Emergency Bypass
+              </div>
+              <div className="text-[10.5px] text-[#94A3B8] font-sans truncate">
+                Shaukat Khanum Hospital // 0% False Positive Baseline
               </div>
             </div>
           </div>
@@ -438,7 +426,7 @@ export default function App() {
       </div>
 
       {/* Main 2-Column Responsive Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0">
         {/* Left Column: The Incident (5 cols) */}
         <div className="lg:col-span-5 flex flex-col min-h-[500px]">
           <ErrorBoundary fallbackTitle="Incident Panel Error">
@@ -452,7 +440,7 @@ export default function App() {
         </div>
 
         {/* Right Column: AI Shield & Actions (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col space-y-5">
+        <div className="lg:col-span-7 flex flex-col space-y-4">
           {/* Top of Right Column: AI Verdict Card */}
           <ErrorBoundary fallbackTitle="AI Verdict Error">
             <ForensicDossier
@@ -466,34 +454,34 @@ export default function App() {
           {/* Bottom of Right Column: Interactive Tabs (Money Trail / Scammer Trap) */}
           <div className="flex-1 flex flex-col min-h-[460px]">
             {/* Tab Selector */}
-            <div className="flex items-center gap-2 mb-3 bg-[#0B111E]/80 p-1.5 rounded-full border border-white/[0.08] w-fit backdrop-blur-md shadow-lg">
+            <div className="flex items-center gap-1.5 mb-2.5 bg-[#0D121D] p-1 rounded-lg border border-white/[0.08] w-fit font-mono text-xs">
               <button
                 type="button"
                 onClick={() => setActiveRightTab("TRAIL")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded font-bold transition-all cursor-pointer ${
                   activeRightTab === "TRAIL"
-                    ? "bg-gradient-to-r from-[#172033] to-[#1E293B] text-white shadow-md border border-white/10"
+                    ? "bg-[#1E293B] text-white shadow-sm"
                     : "text-[#94A3B8] hover:text-white"
                 }`}
               >
-                <GitCommit className="w-4 h-4 text-[#38BDF8]" />
-                <span>Money Trail & Laundering Graph</span>
+                <GitCommit className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <span>MONEY TRAIL & LAUNDERING GRAPH</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveRightTab("DECOY")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded font-bold transition-all cursor-pointer ${
                   activeRightTab === "DECOY"
-                    ? "bg-gradient-to-r from-[#172033] to-[#1E293B] text-white shadow-md border border-white/10"
+                    ? "bg-[#1E293B] text-white shadow-sm"
                     : "text-[#94A3B8] hover:text-white"
                 }`}
               >
-                <Bot className="w-4 h-4 text-[#C084FC]" />
+                <Bot className="w-3.5 h-3.5 text-[#F59E0B]" />
                 <span className="flex items-center gap-1.5">
-                  <span>AI Decoy Honeypot Sting</span>
+                  <span>AI DECOY HONEYPOT STING</span>
                   {capturedIocs.length > 0 && (
-                    <span className="bg-[#EF4444] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold shadow-sm font-mono">
+                    <span className="bg-[#F43F5E] text-white text-[9.5px] px-1.5 py-0.2 rounded font-bold">
                       {capturedIocs.length}
                     </span>
                   )}
