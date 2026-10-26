@@ -1,179 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
-/* Shaheen Interceptor — Luxury Fintech & Cyber Shield Design System
-   Base: Deep OLED Obsidian (#060911 / #0B111E / #111A2E).
-   Accents: Crimson Laser (#EF4444), Amber Gold (#F59E0B), Emerald Safe (#10B981), Cyan Scan (#38BDF8), Violet Decoy (#A855F7).
-*/
-
 @theme {
-  --color-ink: #080B11;
-  --color-ink-raised: #0E131F;
-  --color-ink-raised-2: #141B2D;
-  --color-border: #1E293B;
-  --color-border-strong: #334155;
-  --color-fg: #F8FAFC;
-  --color-fg-muted: #94A3B8;
-  --color-fg-subtle: #64748B;
-  --color-danger: #F43F5E;
-  --color-warn: #F59E0B;
-  --color-ok: #10B981;
-  --color-info: #00F0FF;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
-  --font-sans: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-display: "Inter", "Outfit", system-ui, sans-serif;
+  --color-ink: #090d14;
+  --color-ink-raised: #101722;
+  --color-ink-raised-2: #172131;
+  --color-border: #263244;
+  --color-border-strong: #3a4a61;
+  --color-fg: #f5f7fb;
+  --color-fg-muted: #a9b5c7;
+  --color-fg-subtle: #718096;
+  --color-danger: #f05d69;
+  --color-warn: #e9ad54;
+  --color-ok: #52c99b;
+  --color-info: #6ec8d9;
+  --font-mono: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "DM Sans", sans-serif;
 }
 
-:root {
-  color-scheme: dark;
-}
-
-html, body {
+:root { color-scheme: dark; }
+html { scroll-behavior: smooth; }
+body {
   margin: 0;
-  padding: 0;
-  background-color: #080B11;
-  color: #F8FAFC;
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
   overflow-x: hidden;
-  min-height: 100dvh;
+  background: #090d14;
+  color: #f5f7fb;
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
 }
+#root { min-height: 100dvh; }
+button, input, textarea { font: inherit; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid #6ec8d9; outline-offset: 3px; }
+::selection { background: rgba(110, 200, 217, 0.25); }
 
-#root {
-  width: 100%;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  background-color: #080B11;
-}
-
-/* Tabular numbers for steady metrics */
-.tabular,
-.font-mono {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Tactical Cockpit Background & Radar Grid */
 .mesh-bg {
-  background-color: #080B11;
-  background-image: 
-    radial-gradient(at 15% 10%, rgba(244, 63, 94, 0.05) 0px, transparent 45%),
-    radial-gradient(at 85% 15%, rgba(0, 240, 255, 0.04) 0px, transparent 45%),
-    radial-gradient(at 50% 90%, rgba(245, 158, 11, 0.04) 0px, transparent 50%),
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-  background-position: center center;
+  background-color: #090d14;
+  background-image:
+    radial-gradient(circle at 18% 0%, rgba(110, 200, 217, 0.08), transparent 30%),
+    radial-gradient(circle at 92% 18%, rgba(240, 93, 105, 0.06), transparent 26%),
+    linear-gradient(180deg, rgba(255,255,255,0.018), transparent 42%);
 }
-
-/* Tactical Panel Architecture */
 .bezel-shell {
-  background: #0A0E17;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(16, 23, 34, 0.92);
+  border: 1px solid rgba(169, 181, 199, 0.13);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22), inset 0 1px rgba(255,255,255,0.04);
 }
-
-.bezel-core {
-  background: #0D121D;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.04);
+.bezel-core { background: #121b29; border-color: rgba(169,181,199,0.11); }
+.card-lift:hover { transform: translateY(-2px); }
+.font-mono { font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  body { font-size: 13px; }
 }
-
-/* Card Lift & Tactile Motion */
-.card-lift {
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease;
-}
-.card-lift:hover {
-  transform: translateY(-3px);
-}
-.card-lift:active {
-  transform: translateY(-1px) scale(0.995);
-}
-
-/* Dynamic Equalizer Bar Animations */
-@keyframes eqBounce {
-  0%, 100% { height: 20%; opacity: 0.4; }
-  50% { height: 100%; opacity: 1; }
-}
-
-.eq-bar-1 { animation: eqBounce 0.8s ease-in-out infinite; }
-.eq-bar-2 { animation: eqBounce 1.1s ease-in-out infinite 0.15s; }
-.eq-bar-3 { animation: eqBounce 0.7s ease-in-out infinite 0.3s; }
-.eq-bar-4 { animation: eqBounce 1.2s ease-in-out infinite 0.1s; }
-.eq-bar-5 { animation: eqBounce 0.9s ease-in-out infinite 0.25s; }
-.eq-bar-6 { animation: eqBounce 1.0s ease-in-out infinite 0.05s; }
-
-/* Edge Dash Animation for Laser Network Trail */
-@keyframes flowDash {
-  to {
-    stroke-dashoffset: -24;
-  }
-}
-.flow-animated {
-  stroke-dasharray: 6 4;
-  animation: flowDash 1.2s linear infinite;
-}
-
-/* Subtle Shimmer Sweep for High-Tech CTAs */
-@keyframes shimmerBeam {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
-}
-.shimmer-active {
-  position: relative;
-  overflow: hidden;
-}
-.shimmer-active::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-  transform: translateX(-100%);
-  animation: shimmerBeam 2.8s infinite;
-}
-
-/* Animated 3-Dot Typing Indicator */
-@keyframes dotPulse {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-  40% { transform: scale(1.1); opacity: 1; }
-}
-.dot-typing-1 { animation: dotPulse 1.4s infinite ease-in-out; }
-.dot-typing-2 { animation: dotPulse 1.4s infinite ease-in-out 0.2s; }
-.dot-typing-3 { animation: dotPulse 1.4s infinite ease-in-out 0.4s; }
-
-/* Custom Luxury Scrollbars */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-/* Hide scrollbar utility */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Accessibility: Reduced Motion Fallback */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
