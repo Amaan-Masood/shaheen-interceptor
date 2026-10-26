@@ -23,7 +23,7 @@ export default function TopBar({ systemStatus, onOpenBenchmark }) {
   }, []);
 
   return (
-    <header className="w-full bg-[#080B11] border-b border-white/[0.08] px-4 sm:px-6 lg:px-8 py-2.5 z-30 sticky top-0 shadow-xl backdrop-blur-md">
+    <header className="w-full bg-[#080d15]/95 border-b border-white/[0.08] px-4 sm:px-6 lg:px-8 py-3 z-30 sticky top-0 shadow-[0_12px_36px_rgba(2,8,18,0.3)] backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Left: Institutional National Defense Command Branding */}
         <div className="flex items-center gap-3">
@@ -33,8 +33,8 @@ export default function TopBar({ systemStatus, onOpenBenchmark }) {
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-black tracking-widest text-white font-mono uppercase">
-                SHAHEEN // INTERCEPTOR
+              <span className="text-[13px] sm:text-sm font-extrabold tracking-[0.16em] text-white font-mono uppercase">
+                SHAHEEN / INTERCEPTOR
               </span>
               <span className="text-[9px] font-mono font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#F43F5E]/15 text-[#F43F5E] border border-[#F43F5E]/30 uppercase">
                 BFSI DEFENSE
@@ -80,7 +80,7 @@ export default function TopBar({ systemStatus, onOpenBenchmark }) {
           <button
             type="button"
             onClick={onOpenBenchmark}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#F43F5E] hover:bg-[#E11D48] text-white font-mono font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:shadow-[#F43F5E]/20 active:scale-95"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#F05D69] hover:bg-[#ff7180] text-white font-mono font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer shadow-[0_8px_20px_rgba(240,93,105,0.18)] hover:-translate-y-0.5 active:scale-95"
           >
             <Activity className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">BENCHMARK (90.9% RECALL)</span>
